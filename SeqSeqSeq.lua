@@ -169,12 +169,12 @@ function Seq:new(on, sequence, division, step, behaviour, action)
 end
 
 function new_divider(f)
-	local divcount = 0
-	return
-		function(division)
-			divcount = (global.reset and 1) or (division == 0 and 0) or (divcount % division + 1)
+  local divcount = 0
+  return
+    function(division)
+      divcount = (global.reset and 1) or (division == 0 and 0) or (divcount % division + 1)
       return divcount == 1 and f()
-		end
+    end
 end
 
 function linlin(input, range_min, range_max, output_min, output_max)
