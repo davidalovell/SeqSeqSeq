@@ -1,41 +1,33 @@
-# Compiled Lua sources
-luac.out
+# Created by https://www.toptal.com/developers/gitignore/api/osx
+# Edit at https://www.toptal.com/developers/gitignore?templates=osx
 
-# luarocks build files
-*.src.rock
-*.zip
-*.tar.gz
+### OSX ###
+# General
+.DS_Store
+.AppleDouble
+.LSOverride
 
-# Object files
-*.o
-*.os
-*.ko
-*.obj
-*.elf
+# Icon must end with two \r
+Icon
 
-# Precompiled Headers
-*.gch
-*.pch
 
-# Libraries
-*.lib
-*.a
-*.la
-*.lo
-*.def
-*.exp
+# Thumbnails
+._*
 
-# Shared objects (inc. Windows DLLs)
-*.dll
-*.so
-*.so.*
-*.dylib
+# Files that might appear in the root of a volume
+.DocumentRevisions-V100
+.fseventsd
+.Spotlight-V100
+.TemporaryItems
+.Trashes
+.VolumeIcon.icns
+.com.apple.timemachine.donotpresent
 
-# Executables
-*.exe
-*.out
-*.app
-*.i*86
-*.x86_64
-*.hex
+# Directories potentially created on remote AFP share
+.AppleDB
+.AppleDesktop
+Network Trash Folder
+Temporary Items
+.apdisk
 
+# End of https://www.toptal.com/developers/gitignore/api/osx
