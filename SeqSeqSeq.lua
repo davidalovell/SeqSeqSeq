@@ -7,7 +7,7 @@ lydian = {0,2,4,6,7,9,11}
 mixolydian = {0,2,4,5,7,9,10}
 aeolian = {0,2,3,5,7,8,10}
 
-divs = {
+div = {
     x2 = {1,2,4,8,16,32,64}
   , odd = {1,3,5,7,9}
   , even = {1,2,4,6,8,10}
@@ -223,18 +223,18 @@ function init()
   v[1]:new_seq(1, true, {1,2,3,1/2}, 1, 1, 'next', true)
   v[1]:new_seq(2, true, {true,false},1, 1, 'next')
   v[1].action = function(self, val)
-    self.seq[1].mod.division = val * selector(txi.param[2], divs.even, 0, 10)
+    self.seq[1].mod.division = val * selector(txi.param[2], div.even, 0, 10)
     self.mod.on = self:play_seq(2)
-    self.seq[2].mod.division = selector(txi.param[1], divs.x2, 0, 10)
+    self.seq[2].mod.division = selector(txi.param[1], div.x2, 0, 10)
   end
 
   v[2] = Voice:new(true, true, true, 0.5, -2, 5, 0)
   v[2]:new_seq(1, true, {1,5}, 1, 1, 'next', true)
   v[2]:new_seq(2, true, {true,false},1, 1, 'next')
   v[2].action = function(self, val)
-    self.seq[1].mod.division = val * selector(txi.param[2], divs.odd, 0, 10)
+    self.seq[1].mod.division = val * selector(txi.param[2], div.odd, 0, 10)
     self.mod.on = self:play_seq(2)
-    self.seq[2].mod.division = selector(txi.param[1], divs.x2, 0, 10)
+    self.seq[2].mod.division = selector(txi.param[1], div.x2, 0, 10)
   end
 
   v[3] = Voice:new(true, true, true, 0.5, 1, 3, 0, function(note, level) ii.wsyn.play_note(note, level) end)
@@ -247,7 +247,7 @@ function init()
   v[4]:new_seq(1, true, {4,3,1}, 1, 1, 'next', true)
   v[4]:new_seq(2, true, {1,1,1}, 1, 1, 'next')
   v[4].action = function(self, val)
-    self.seq[1].mod.division = val * selector(txi.param[3], divs.x2, 0, 10)
+    self.seq[1].mod.division = val * selector(txi.param[3], div.x2, 0, 10)
     self.seq[1].sequence = selector(txi.param[4], {{4,3,1}, {2,1/2,1/2,1}}, 0, 10)
     self.seq[2].sequence[3] = math.random(3,4)
     self.mod.degree = self:play_seq(2)
@@ -288,7 +288,7 @@ function on_clock()
   clock_reset(global.count)
 
   global.bpm = linlin(txi.input[1], 0, 5, 10, 3000)
-  global.division = selector(txi.input[2], divs.x2, 0, 4)
+  global.division = selector(txi.input[2], div.x2, 0, 4)
   global.negharm = selector(txi.input[3], {false,true}, 0, 4)
 
   metro[1].time = 60/global.bpm
