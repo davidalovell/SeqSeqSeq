@@ -208,9 +208,9 @@ function init()
 
   txi_getter()
 
-  clock_divider = new_divider(function() output[1](pulse(0.01)) on_division() end)
   clock_reset = new_divider(function() global.reset = true end)
   trigger_reset = new_divider(function() global.reset = true end)
+  clock_divider = new_divider(function() output[1](pulse(0.01)) on_division() end)
 
   -- declare voices/sequencers/actions, e.g.
   -- v = {}
@@ -278,9 +278,10 @@ input[2].change = function()
 end
 
 function on_clock()
-  txi_getter()
   clock_reset(global.count)
-
+  
+  txi_getter()
+    
   -- variables to be set every clock pulse, e.g.
   -- global.bpm = linlin(txi.input[1], 0, 5, 10, 3000)
   -- global.division = selector(txi.input[2], div.x2, 0, 4)
@@ -288,6 +289,7 @@ function on_clock()
 
   metro[1].time = 60/global.bpm
   clock_divider(global.division)
+  
   global.reset = false
 end
 
