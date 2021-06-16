@@ -86,7 +86,7 @@ function Voice:new(on, ext_octave, ext_degree, level, octave, degree, transpose,
 
     local note = scale[index] + transpose
     local negative = (7 - note) % 12
-  	note = negharm and negative or note
+    note = negharm and negative or note
 
     return note / 12 + octave
   end
