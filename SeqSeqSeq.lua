@@ -199,22 +199,23 @@ function init()
   input[1].mode('scale', CV_SCALE)
   input[2].mode('change', 4, 0.1, 'rising')
 
-  output[2](lfo(8,5,'sine'))
-
   metro[1].event = on_clock
   metro[1].time = 60/global.bpm
   metro[1]:start()
 
   ii.wsyn.ar_mode(1)
   ii.jf.mode(1)
-  ii.jf.run_mode(1)
-  ii.jf.run(5)
 
   txi_getter()
 
   clock_divider = new_divider(function() output[1](pulse(0.01)) on_division() end)
   clock_reset = new_divider(function() global.reset = true end)
   trigger_reset = new_divider(function() global.reset = true end)
+    
+  ii.jf.run_mode(1)
+  ii.jf.run(5)
+    
+  output[2](lfo(8,5,'sine'))
 
   v = {}
   voices = v
