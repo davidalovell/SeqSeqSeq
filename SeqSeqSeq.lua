@@ -267,7 +267,7 @@ end
 
 input[2].change = function()
   trigger_reset(global.count)
-
+  
   -- voices/seqeuncers to play on trigger to crow input[2]
   -- v.trig1:play_voice()
   -- v.trig2:play_voice()
