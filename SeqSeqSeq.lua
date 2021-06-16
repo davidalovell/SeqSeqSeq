@@ -211,48 +211,6 @@ function init()
   clock_divider = new_divider(function() output[1](pulse(0.01)) on_division() end)
   clock_reset = new_divider(function() global.reset = true end)
   trigger_reset = new_divider(function() global.reset = true end)
-    
-  ii.jf.run_mode(1)
-  ii.jf.run(5)
-    
-  output[2](lfo(8,5,'sine'))
-
-  v = {}
-  voices = v
-
-  v[1] = Voice:new(true, true, true, 0.5, -1, 1, 0)
-  v[1]:new_seq(1, true, {1,2,3,1/2}, 1, 1, 'next', true)
-  v[1]:new_seq(2, true, {true,false},1, 1, 'next')
-  v[1].action = function(self, val)
-    self.seq[1].mod.division = val * selector(txi.param[2], div.even, 0, 10)
-    self.mod.on = self:play_seq(2)
-    self.seq[2].mod.division = selector(txi.param[1], div.x2, 0, 10)
-  end
-
-  v[2] = Voice:new(true, true, true, 0.5, -2, 5, 0)
-  v[2]:new_seq(1, true, {1,5}, 1, 1, 'next', true)
-  v[2]:new_seq(2, true, {true,false},1, 1, 'next')
-  v[2].action = function(self, val)
-    self.seq[1].mod.division = val * selector(txi.param[2], div.odd, 0, 10)
-    self.mod.on = self:play_seq(2)
-    self.seq[2].mod.division = selector(txi.param[1], div.x2, 0, 10)
-  end
-
-  v[3] = Voice:new(true, true, true, 0.5, 1, 3, 0, function(note, level) ii.wsyn.play_note(note, level) end)
-  v[3]:new_seq(1, true, {3,1, 3,1, 3,1, 2,1,1}, 1, 1, 'next', true)
-  v[3].action = function(self, val)
-    self.seq[1].mod.division = val
-  end
-
-  v[4] = Voice:new(true, false, true, 1.5, -2, 1, 0, function(note, level) ii.jf.play_voice(1, note, level) end)
-  v[4]:new_seq(1, true, {4,3,1}, 1, 1, 'next', true)
-  v[4]:new_seq(2, true, {1,1,1}, 1, 1, 'next')
-  v[4].action = function(self, val)
-    self.seq[1].mod.division = val * selector(txi.param[3], div.x2, 0, 10)
-    self.seq[1].sequence = selector(txi.param[4], {{4,3,1}, {2,1/2,1/2,1}}, 0, 10)
-    self.seq[2].sequence[3] = math.random(3,4)
-    self.mod.degree = self:play_seq(2)
-  end
 end
 
 function txi_getter()
@@ -277,23 +235,17 @@ end
 input[2].change = function()
   trigger_reset(global.count)
 
-  for k, v in pairs(voices) do
-    voices[k]:play_seq()
-  end
-
   global.reset = false
 end
 
 function on_clock()
-  txi_getter()
   clock_reset(global.count)
 
-  global.bpm = linlin(txi.input[1], 0, 5, 10, 3000)
-  global.division = selector(txi.input[2], div.x2, 0, 4)
-  global.negharm = selector(txi.input[3], {false,true}, 0, 4)
+  txi_getter()
 
   metro[1].time = 60/global.bpm
   clock_divider(global.division)
+
   global.reset = false
 end
 
