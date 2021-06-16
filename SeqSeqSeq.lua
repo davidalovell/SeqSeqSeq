@@ -244,7 +244,6 @@ function init()
   --   self.seq[2].sequence[3] = math.random(3,4)
   --   self.mod.degree = self:play_seq(2)
   -- end
-
 end
 
 function txi_getter()
@@ -279,9 +278,9 @@ end
 
 function on_clock()
   clock_reset(global.count)
-  
+
   txi_getter()
-    
+
   -- variables to be set every clock pulse, e.g.
   -- global.bpm = linlin(txi.input[1], 0, 5, 10, 3000)
   -- global.division = selector(txi.input[2], div.x2, 0, 4)
@@ -289,7 +288,7 @@ function on_clock()
 
   metro[1].time = 60/global.bpm
   clock_divider(global.division)
-  
+
   global.reset = false
 end
 
