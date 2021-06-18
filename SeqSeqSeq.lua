@@ -227,7 +227,7 @@ function init()
   arp:new_seq(2, true, {-6,-4,-2,1,3,5,8}, 3, 1, 'prev', true)
   arp:new_seq(3, true, {2,5,7}, 1, 1, 'next')
   arp:new_seq(4, true, {2,1,1,1,3}, 1, 1, 'next')
-  arp:new_seq(5, true, {true,false}, 8, 1, 'next')
+  arp:new_seq(5, true, {true,true,true,false,false,false,false,false}, 4, 1, 'next')
   function arp:action(val)
     self.mod.degree = val + chord
     self.mod.on = self:play_seq(5)
