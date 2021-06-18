@@ -20,7 +20,7 @@ CV_DEGREE = 1
 global = {
     bpm = 120
   , division = 1
-  , count = 256
+  , count = 0
   , reset = false
 
   , on = true
@@ -218,14 +218,31 @@ function init()
   output[2](lfo(8,5,'sine'))
 
   -- declare voices/sequencers/actions, e.g.
-  v = {}
-  v.kb1 = Voice:new(true, true, true, 1, 0, 1, 0)
+  new_chord = Seq:new(true, {1,5,0,1}, 64, 1, 'next')
 
-  v.kb2 = Voice:new(true, true, true, 1, -1, 1, 0)
-  v.kb2:new_seq(1, true, {1,4,5,8}, 1, 1, 'prev', true)
-  function v.kb2:action(val)
-    self.mod.degree = val
+  kb = Voice:new(true, true, true, 1, 0, 1, 0, function(note, level) ii.wsyn.play_note(note, level) end)
+
+  arp = Voice:new(true, false, false, 0.75, 0, 1, 0)
+  arp:new_seq(1, true, {-6,-4,-2,1,3,5,8}, 1, 1, 'next', true)
+  arp:new_seq(2, true, {-6,-4,-2,1,3,5,8}, 3, 1, 'prev', true)
+  arp:new_seq(3, true, {2,5,7}, 1, 1, 'next')
+  arp:new_seq(4, true, {2,1,1,1,3}, 1, 1, 'next')
+  arp:new_seq(5, true, {true,false}, 8, 1, 'next')
+  function arp:action(val)
+    self.mod.degree = val + chord
+    self.mod.on = self:play_seq(5)
+    self.seq[1].mod.division = self:play_seq(2)
+    self.seq[2].mod.division = self:play_seq(4)
   end
+
+  bass = Voice:new(true, false, false, 1.5, -2, 1, 0, function(note, level) ii.jf.play_voice(1, note, level) end)
+  bass:new_seq(1, true, {-2,1,3,5}, 4, 1, 'random', true)
+  bass:new_seq(2, true, {4,3,1}, 1, 1, 'next')
+  function bass:action(val)
+    self.mod.degree = val + chord
+    self.seq[1].mod.division = self:play_seq(2)
+  end
+
 end
 
 function txi_getter()
@@ -251,8 +268,7 @@ input[2].change = function()
   trigger_reset(global.count)
 
   -- voices/seqeuncers to play on trigger to crow input[2]
-  v.kb1:play_voice()
-  v.kb2:play_seq()
+  kb:play_voice()
 
   global.reset = false
 end
@@ -275,6 +291,7 @@ end
 
 function on_division()
   -- voices/sequencers to play on every clock division
-  -- v.div1:play_seq()
-  -- v.div2:play_seq()
+  chord = new_chord:play_seq() -  1
+  arp:play_seq()
+  bass:play_seq()
 end
