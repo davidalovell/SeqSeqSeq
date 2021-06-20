@@ -43,7 +43,7 @@ function Voice:new(on, ext_octave, ext_degree, level, octave, degree, transpose,
 
   o.seq = {}
   o.new_seq = function(self, id, on, sequence, division, step, behaviour, action)
-    action = (action and function (val) self:play_voice(val) end) or (type(action) == 'function' and action)
+    action = (action and function(val) self:play_voice(val) end) or (type(action) == 'function' and action)
     self.seq[id] = Seq:new(on, sequence, division, step, behaviour, action)
   end
 
@@ -267,7 +267,7 @@ end
 
 input[2].change = function()
   trigger_reset(global.count)
-  
+
   -- voices/seqeuncers to play on trigger to crow input[2]
   -- v.trig1:play_voice()
   -- v.trig2:play_voice()
