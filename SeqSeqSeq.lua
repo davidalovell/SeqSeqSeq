@@ -20,7 +20,7 @@ CV_DEGREE = 1
 global = {
     bpm = 120
   , division = 1
-  , count = 256
+  , count = 0
   , reset = false
 
   , on = true
@@ -43,7 +43,7 @@ function Voice:new(on, ext_octave, ext_degree, level, octave, degree, transpose,
 
   o.seq = {}
   o.new_seq = function(self, id, on, sequence, division, step, behaviour, action)
-    action = (action and function (val) self:play_voice(val) end) or (type(action) == 'function' and action)
+    action = (action and function(val) self:play_voice(val) end) or (type(action) == 'function' and action)
     self.seq[id] = Seq:new(on, sequence, division, step, behaviour, action)
   end
 
@@ -213,37 +213,42 @@ function init()
   clock_divider = new_divider(function() output[1](pulse(0.01)) on_division() end)
 
   -- declare voices/sequencers/actions, e.g.
-  -- v = {}
-  -- v.trig1 = Voice:new(true, true, true, 1, 0, 1, 0)
-  --
-  -- v.trig2 = Voice:new(true, true, true, 1, 0, 5, 0)
-  --
-  -- v.trig3 = Voice:new(true, true, true, 2, 1, 1, 0)
-  -- v.trig3:new_seq(1, true, {1,3,5}, 1, 1, 'next', true)
-  -- v.trig3:new_seq(2, true, {2,3,3}, 1, 1, 'next')
-  -- function v.trig3:action(val)
-  --   self.mod.degree = val
-  --   self.seq[1].mod.division = self:play_seq(2)
-  -- end
-  --
-  -- v.div1 = Voice:new(true, false, false, 0.5, 1, 1, 0, function(note, level) ii.wsyn.play_note(note, level) end)
-  -- v.div1:new_seq(1, true, {1,2,3,4,5,6,7}, 1, 2, 'next', true)
-  -- v.div1:new_seq(2, true, {1,3,5}, 4, 1, 'next')
-  -- v.div1:new_seq(3, true, {2,3,1}, 1, 1, 'next')
-  -- function v.div1:action(val)
-  --   self.mod.degree = val + self:play_seq(2)
-  --   self.seq[1].mod.division = self:play_seq(3)
-  -- end
-  --
-  -- v.div2 = Voice:new(true, false, true, 1.5, -2, 1, 0, function(note, level) ii.jf.play_voice(1, note, level) end)
-  -- v.div2:new_seq(1, true, {4,3,1}, 1, 1, 'next', true)
-  -- v.div2:new_seq(2, true, {1,1,1}, 1, 1, 'next')
-  -- function v.div2:action(val)
-  --   self.seq[1].mod.division = val * selector(txi.param[3], div.x2, 0, 10)
-  --   self.seq[1].sequence = selector(txi.param[4], {{4,3,1}, {2,1/2,1/2,1}}, 0, 10)
-  --   self.seq[2].sequence[3] = math.random(3,4)
-  --   self.mod.degree = self:play_seq(2)
-  -- end
+  ii.jf.run_mode(1)
+  ii.jf.run(5)
+  output[2](lfo(8,5,'sine'))
+
+  triads = {{1,3,5}, {2,4,6}, {3,5,7}, {4,6,1}, {5,7,2}, {6,1,3}, {7,2,4}}
+
+  new_chord = Seq:new(true, {1,5,4,1}, 24, 1, 'next')
+
+  arp = Voice:new(true, false, false, 0.75, 0, 1, 0)
+  arp:new_seq(1, true, {1}, 3, 1, 'next', true)
+  arp:new_seq(2, true, {1,2,3}, 4, 1, 'prev')
+  arp:new_seq(3, true, {4,1,1,3,1}, 1, 1, 'next')
+  function arp:action(val)
+    self.seq[1].sequence = triads[chord]
+    self.seq[1].sequence[4] = self.seq[1].sequence[self:play_seq(2)] + math.random(0,1) * 7
+    self.seq[1].mod.division = self:play_seq(3)
+    self.mod.degree = val
+  end
+
+  arp2 = Voice:new(true, false, false, 0.5, 0, 5, 0)
+  arp2:new_seq(1, true, {1}, 2, 2, 'next', true)
+  arp2:new_seq(2, true, {6,4,1,1}, 1, 1, 'next')
+  function arp2:action(val)
+    self.seq[1].sequence = triads[chord]
+    self.seq[1].mod.division = self:play_seq(2)
+    self.mod.degree = val + math.random(-1,0) * 7
+  end
+
+  bass = Voice:new(true, false, false, 1, -2, 1, 0, function(note, level) ii.jf.play_voice(1, note, level) end)
+  bass:new_seq(1, true, {1,1,1}, 4, 1, 'next', true)
+  bass:new_seq(2, true, {6,4,2}, 1, 1, 'next')
+  function bass:action(val)
+    self.seq[1].sequence[3] = triads[chord][3] + math.random(-1,1)
+    self.seq[1].mod.division = self:play_seq(2)
+    self.mod.degree = val + (triads[chord][1] - 1)
+  end
 end
 
 function txi_getter()
@@ -267,11 +272,8 @@ end
 
 input[2].change = function()
   trigger_reset(global.count)
-  
+
   -- voices/seqeuncers to play on trigger to crow input[2]
-  -- v.trig1:play_voice()
-  -- v.trig2:play_voice()
-  -- v.trig3:play_seq()
 
   global.reset = false
 end
@@ -282,9 +284,9 @@ function on_clock()
   txi_getter()
 
   -- variables to be set every clock pulse, e.g.
-  -- global.bpm = linlin(txi.input[1], 0, 5, 10, 3000)
-  -- global.division = selector(txi.input[2], div.x2, 0, 4)
-  -- global.negharm = selector(txi.input[3], {false,true}, 0, 4)
+  global.bpm = linlin(txi.input[1], 0, 5, 10, 3000)
+  global.division = selector(txi.input[2], div.x2, 0, 4)
+  global.negharm = selector(txi.input[3], {false,true}, 0, 4)
 
   metro[1].time = 60/global.bpm
   clock_divider(global.division)
@@ -294,6 +296,8 @@ end
 
 function on_division()
   -- voices/sequencers to play on every clock division
-  -- v.div1:play_seq()
-  -- v.div2:play_seq()
+  chord = new_chord:play_seq()
+  arp:play_seq()
+  arp2:play_seq()
+  bass:play_seq()
 end
