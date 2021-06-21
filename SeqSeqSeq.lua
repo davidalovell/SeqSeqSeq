@@ -20,7 +20,7 @@ CV_DEGREE = 1
 global = {
     bpm = 120
   , division = 1
-  , count = 0
+  , count = 0 -- closures not working well for timing
   , reset = false
 
   , on = true
