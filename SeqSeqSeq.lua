@@ -59,15 +59,17 @@ function Voice:new(on, ext_octave, ext_degree, level, octave, degree, transpose,
 
   o.play_voice = function(self, val)
     self:action(val)
-
-    local on = (global.on == nil or global.on) and self.on and self.mod.on
-    local note = self:new_note()
-    local level = self.level * self.mod.level * global.level
-
-    return on and self.synth(note, level)
+    self:play_note()
   end
 
   o.action = function(self, val)
+  end
+
+  o.play_note = function(self)
+    local on = (global.on == nil or global.on) and self.on and self.mod.on
+    local note = self:new_note()
+    local level = self.level * self.mod.level * global.level
+    return on and self.synth(note, level)
   end
 
   o.new_note = function(self)
@@ -212,7 +214,6 @@ function init()
   trigger_reset = new_divider(function() global.reset = true end)
   clock_divider = new_divider(function() output[1](pulse(0.01)) on_division() end)
 
-  -- declare voices/sequencers/actions, e.g.
   ii.jf.run_mode(1)
   ii.jf.run(5)
   output[2](lfo(8,5,'sine'))
@@ -273,8 +274,6 @@ end
 input[2].change = function()
   trigger_reset(global.count)
 
-  -- voices/seqeuncers to play on trigger to crow input[2]
-
   global.reset = false
 end
 
@@ -283,7 +282,6 @@ function on_clock()
 
   txi_getter()
 
-  -- variables to be set every clock pulse, e.g.
   global.bpm = linlin(txi.input[1], 0, 5, 10, 3000)
   global.division = selector(txi.input[2], div.x2, 0, 4)
   global.negharm = selector(txi.input[3], {false,true}, 0, 4)
@@ -295,7 +293,6 @@ function on_clock()
 end
 
 function on_division()
-  -- voices/sequencers to play on every clock division
   chord = new_chord:play_seq()
   arp:play_seq()
   arp2:play_seq()
