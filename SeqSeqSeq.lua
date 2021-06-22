@@ -242,8 +242,8 @@ function init()
   end
 
   bass = Voice:new(true, false, false, false, 1, -2, 1, 0, function(note, level) ii.jf.play_voice(1, note, level) end)
-  bass:new_seq(1, true, {1,3,5}, 4, 1, 'next', true)
-  bass:new_seq(2, true, {6,4,2}, 1, 1, 'next')
+  bass:new_seq(1, true, {1,3,5}, 6, 1, 'next', true)
+  bass:new_seq(2, true, {4,3,1,3,1,1,1,1,1}, 1, 1, 'next')
   function bass:action(val)
     self.seq[1].sequence[3] = 5 + math.random(-1,1)
     self.seq[1].mod.division = self:play_seq(2)
