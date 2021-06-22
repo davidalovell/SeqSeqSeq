@@ -20,7 +20,7 @@ CV_DEGREE = 1
 global = {
     bpm = 120
   , division = 1
-  , count = 0 -- closures not working well for timing
+  , count = 0
   , reset = false
 
   , on = true
@@ -36,7 +36,7 @@ global = {
 txi = {param = {}, input = {}}
 
 Voice = {}
-function Voice:new(on, ext_octave, ext_degree, level, octave, degree, transpose, synth)
+function Voice:new(on, ext_octave, ext_degree, octave_wrap, level, octave, degree, transpose, synth)
   local o = {}
   setmetatable(o, self)
   self.__index = self
@@ -83,7 +83,8 @@ function Voice:new(on, ext_octave, ext_degree, level, octave, degree, transpose,
 
     local transpose = s.transpose + s.mod.transpose + global.transpose
     local degree = (s.degree - 1) + (s.mod.degree - 1) + (cv_degree - 1) + (global.degree - 1)
-    local octave = s.octave + s.mod.octave + cv_octave + math.floor(degree / #scale) + global.octave
+    local octave_wrap = o.wrap and 0 or math.floor(degree / #scale)
+    local octave = s.octave + s.mod.octave + cv_octave + global.octave + octave_wrap
     local index = degree % #scale + 1
 
     local note = scale[index] + transpose
@@ -102,6 +103,7 @@ function Voice:new(on, ext_octave, ext_degree, level, octave, degree, transpose,
 
   o.scale = global.scale == nil and CV_SCALE or global.scale
   o.negharm = global.negharm or false
+  o.wrap = octave_wrap or false
 
   o.on = on and true or false
   o.level = level or 1
@@ -218,37 +220,34 @@ function init()
   ii.jf.run(5)
   output[2](lfo(8,5,'sine'))
 
-  triads = {{1,3,5}, {2,4,6}, {3,5,7}, {4,6,1}, {5,7,2}, {6,1,3}, {7,2,4}}
+  new_chord = Seq:new(true, {5,4,1,1}, 24, 1, 'next')
 
-  new_chord = Seq:new(true, {1,5,4,1}, 24, 1, 'next')
-
-  arp = Voice:new(true, false, false, 0.75, 0, 1, 0)
-  arp:new_seq(1, true, {1}, 3, 1, 'next', true)
-  arp:new_seq(2, true, {1,2,3}, 4, 1, 'prev')
+  arp = Voice:new(true, false, false, false, 0.75, -1, 1, 0)
+  arp:new_seq(1, true, {1,3,5}, 3, 1, 'prev', true)
+  arp:new_seq(2, true, {1,2,3}, 4, 1, 'next')
   arp:new_seq(3, true, {4,1,1,3,1}, 1, 1, 'next')
   function arp:action(val)
-    self.seq[1].sequence = triads[chord]
     self.seq[1].sequence[4] = self.seq[1].sequence[self:play_seq(2)] + math.random(0,1) * 7
     self.seq[1].mod.division = self:play_seq(3)
-    self.mod.degree = val
+    self.mod.degree = val + (chord - 1)
   end
 
-  arp2 = Voice:new(true, false, false, 0.5, 0, 5, 0)
-  arp2:new_seq(1, true, {1}, 2, 2, 'next', true)
+  arp2 = Voice:new(true, false, false, true, 0.5, 0, 5, 0)
+  arp2:new_seq(1, true, {1,3,5}, 2, 2, 'next', true)
   arp2:new_seq(2, true, {6,4,1,1}, 1, 1, 'next')
   function arp2:action(val)
-    self.seq[1].sequence = triads[chord]
+    self.seq[1].sequence[4] = self.seq[1].sequence[math.random(0,3)]
     self.seq[1].mod.division = self:play_seq(2)
-    self.mod.degree = val + math.random(-1,0) * 7
+    self.mod.degree = val + (chord - 1)
   end
 
-  bass = Voice:new(true, false, false, 1, -2, 1, 0, function(note, level) ii.jf.play_voice(1, note, level) end)
-  bass:new_seq(1, true, {1,1,1}, 4, 1, 'next', true)
+  bass = Voice:new(true, false, false, false, 1, -2, 1, 0, function(note, level) ii.jf.play_voice(1, note, level) end)
+  bass:new_seq(1, true, {1,3,5}, 4, 1, 'next', true)
   bass:new_seq(2, true, {6,4,2}, 1, 1, 'next')
   function bass:action(val)
-    self.seq[1].sequence[3] = triads[chord][3] + math.random(-1,1)
+    self.seq[1].sequence[3] = 5 + math.random(-1,1)
     self.seq[1].mod.division = self:play_seq(2)
-    self.mod.degree = val + (triads[chord][1] - 1)
+    self.mod.degree = val + (chord - 1)
   end
 end
 
@@ -273,20 +272,20 @@ end
 
 input[2].change = function()
   trigger_reset(global.count)
-
+  --
   global.reset = false
 end
 
 function on_clock()
-  clock_reset(global.count)
-
   txi_getter()
 
   global.bpm = linlin(txi.input[1], 0, 5, 10, 3000)
   global.division = selector(txi.input[2], div.x2, 0, 4)
   global.negharm = selector(txi.input[3], {false,true}, 0, 4)
-
+  global.count = global.division * new_chord.division * #new_chord.sequence * 4
   metro[1].time = 60/global.bpm
+
+  clock_reset(global.count)
   clock_divider(global.division)
 
   global.reset = false
