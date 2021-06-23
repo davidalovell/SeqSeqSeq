@@ -1,5 +1,7 @@
 --- SeqSeqSeq
 
+CV_SCALE = lydian
+
 ionian = {0,2,4,5,7,9,11}
 dorian = {0,2,3,5,7,9,10}
 phrygian = {0,1,3,5,7,8,10}
@@ -13,8 +15,6 @@ div = {
   , even = {1,2,4,6,8,10}
 }
 
-CV_SCALE = lydian
-
 global = {
     bpm = 120
   , division = 1
@@ -27,8 +27,8 @@ global = {
   , degree = 1
   , transpose = 0
 
-  , scale = mixolydian
-  , negharm = false
+  , scale = mixolydian --nil
+  , negharm = false --nil
 }
 
 txi = {param = {}, input = {}}
