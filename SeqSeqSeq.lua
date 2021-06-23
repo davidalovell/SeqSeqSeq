@@ -14,13 +14,11 @@ div = {
 }
 
 CV_SCALE = lydian
-CV_OCTAVE = 0
-CV_DEGREE = 1
 
 global = {
     bpm = 120
   , division = 1
-  , count = 0 -- closures not working well for timing
+  , count = 0
   , reset = false
 
   , on = true
@@ -78,8 +76,8 @@ function Voice:new(on, ext_octave, ext_degree, level, octave, degree, transpose,
     local scale = global.scale == nil and s.scale or global.scale
     local negharm = global.negharm == nil and s.negharm or global.negharm
 
-    local cv_degree = s.ext_degree and CV_DEGREE or 1
-    local cv_octave = s.ext_octave and CV_OCTAVE or 0
+    local cv_degree = s.ext_degree and global.cv_degree or 1
+    local cv_octave = s.ext_octave and global.cv_octave or 0
 
     local transpose = s.transpose + s.mod.transpose + global.transpose
     local degree = (s.degree - 1) + (s.mod.degree - 1) + (cv_degree - 1) + (global.degree - 1)
@@ -205,8 +203,8 @@ function init()
   metro[1].time = 60/global.bpm
   metro[1]:start()
 
-  ii.wsyn.ar_mode(1)
   ii.jf.mode(1)
+  ii.wsyn.ar_mode(1)
 
   txi_getter()
 
@@ -243,8 +241,8 @@ function init()
   end
 
   bass = Voice:new(true, false, false, 1, -2, 1, 0, function(note, level) ii.jf.play_voice(1, note, level) end)
-  bass:new_seq(1, true, {1,1,1}, 4, 1, 'next', true)
-  bass:new_seq(2, true, {6,4,2}, 1, 1, 'next')
+  bass:new_seq(1, true, {1,1,1}, 6, 1, 'next', true)
+  bass:new_seq(2, true, {4,3,1}, 1, 1, 'next')
   function bass:action(val)
     self.seq[1].sequence[3] = triads[chord][3] + math.random(-1,1)
     self.seq[1].mod.division = self:play_seq(2)
@@ -267,8 +265,8 @@ ii.txi.event = function(e, val)
 end
 
 input[1].scale = function(s)
-  CV_OCTAVE = s.octave
-  CV_DEGREE = s.index
+  global.cv_octave = s.octave
+  global.cv_degree = s.index
 end
 
 input[2].change = function()
@@ -278,17 +276,16 @@ input[2].change = function()
 end
 
 function on_clock()
-  clock_reset(global.count)
-
   txi_getter()
 
   global.bpm = linlin(txi.input[1], 0, 5, 10, 3000)
   global.division = selector(txi.input[2], div.x2, 0, 4)
   global.negharm = selector(txi.input[3], {false,true}, 0, 4)
-
+  global.count = global.division * new_chord.division * #new_chord.sequence * 4
   metro[1].time = 60/global.bpm
-  clock_divider(global.division)
 
+  clock_reset(global.count)
+  clock_divider(global.division)
   global.reset = false
 end
 
