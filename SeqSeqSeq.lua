@@ -1,5 +1,7 @@
 --- SeqSeqSeq
 
+CV_SCALE = lydian
+
 ionian = {0,2,4,5,7,9,11}
 dorian = {0,2,3,5,7,9,10}
 phrygian = {0,1,3,5,7,8,10}
@@ -12,10 +14,6 @@ div = {
   , odd = {1,3,5,7,9}
   , even = {1,2,4,6,8,10}
 }
-
-CV_SCALE = lydian
-CV_OCTAVE = 0
-CV_DEGREE = 1
 
 global = {
     bpm = 120
@@ -78,13 +76,13 @@ function Voice:new(on, ext_octave, ext_degree, octave_wrap, level, octave, degre
     local scale = global.scale == nil and s.scale or global.scale
     local negharm = global.negharm == nil and s.negharm or global.negharm
 
-    local cv_degree = s.ext_degree and CV_DEGREE or 1
-    local cv_octave = s.ext_octave and CV_OCTAVE or 0
+    local cv_degree = s.ext_degree and global.cv_degree or 1
+    local cv_octave = s.ext_octave and global.cv_octave or 0
 
     local transpose = s.transpose + s.mod.transpose + global.transpose
     local degree = (s.degree - 1) + (s.mod.degree - 1) + (cv_degree - 1) + (global.degree - 1)
-    local octave_wrap = o.wrap and 0 or math.floor(degree / #scale)
-    local octave = s.octave + s.mod.octave + cv_octave + global.octave + octave_wrap
+    local octave_wrap = o.octave_wrap and 0 or math.floor(degree / #scale)
+    local octave = s.octave + s.mod.octave + octave_wrap + cv_octave + global.octave
     local index = degree % #scale + 1
 
     local note = scale[index] + transpose
@@ -103,9 +101,9 @@ function Voice:new(on, ext_octave, ext_degree, octave_wrap, level, octave, degre
 
   o.scale = global.scale == nil and CV_SCALE or global.scale
   o.negharm = global.negharm or false
-  o.wrap = octave_wrap or false
 
   o.on = on and true or false
+  o.octave_wrap = octave_wrap or false
   o.level = level or 1
   o.octave = octave or 0
   o.degree = degree or 1
@@ -266,8 +264,8 @@ ii.txi.event = function(e, val)
 end
 
 input[1].scale = function(s)
-  CV_OCTAVE = s.octave
-  CV_DEGREE = s.index
+  global.cv_octave = s.octave
+  global.cv_degree = s.index
 end
 
 input[2].change = function()
