@@ -34,7 +34,7 @@ global = {
 txi = {param = {}, input = {}}
 
 Voice = {}
-function Voice:new(on, ext_octave, ext_degree, octave_wrap, level, octave, degree, transpose, synth)
+function Voice:new(on, octave_wrap, ext_octave, ext_degree, level, octave, degree, transpose, synth)
   local o = {}
   setmetatable(o, self)
   self.__index = self
@@ -230,7 +230,7 @@ function init()
     self.mod.degree = val + (chord - 1)
   end
 
-  arp2 = Voice:new(true, false, false, true, 0.5, 0, 5, 0)
+  arp2 = Voice:new(true, true, false, false, 0.5, 0, 5, 0)
   arp2:new_seq(1, true, {1,3,5}, 2, 2, 'next', true)
   arp2:new_seq(2, true, {6,4,1,1}, 1, 1, 'next')
   function arp2:action(val)
