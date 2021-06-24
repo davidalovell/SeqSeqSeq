@@ -34,7 +34,7 @@ global = {
 txi = {param = {}, input = {}}
 
 Voice = {}
-function Voice:new(on, octave_wrap, ext_octave, ext_degree, level, octave, degree, transpose, synth)
+function Voice:new(on, ext_octave, ext_degree, level, octave, degree, transpose, octave_wrap, synth)
   local o = {}
   setmetatable(o, self)
   self.__index = self
@@ -220,7 +220,7 @@ function init()
 
   new_chord = Seq:new(true, {5,4,1,1}, 24, 1, 'next')
 
-  arp = Voice:new(true, false, false, false, 0.75, -1, 1, 0)
+  arp = Voice:new(true, false, false, 0.75, -1, 1, 0)
   arp:new_seq(1, true, {1,3,5}, 3, 1, 'prev', true)
   arp:new_seq(2, true, {1,2,3}, 4, 1, 'next')
   arp:new_seq(3, true, {4,1,1,3,1}, 1, 1, 'next')
@@ -230,7 +230,7 @@ function init()
     self.mod.degree = val + (chord - 1)
   end
 
-  arp2 = Voice:new(true, true, false, false, 0.5, 0, 5, 0)
+  arp2 = Voice:new(true, false, false, 0.5, 0, 5, 0, true)
   arp2:new_seq(1, true, {1,3,5}, 2, 2, 'next', true)
   arp2:new_seq(2, true, {6,4,1,1}, 1, 1, 'next')
   function arp2:action(val)
@@ -239,7 +239,7 @@ function init()
     self.mod.degree = val + (chord - 1)
   end
 
-  bass = Voice:new(true, false, false, false, 1, -2, 1, 0, function(note, level) ii.jf.play_voice(1, note, level) end)
+  bass = Voice:new(true, false, false, 1, -2, 1, 0, false, function(note, level) ii.jf.play_voice(1, note, level) end)
   bass:new_seq(1, true, {1,3,5}, 6, 1, 'next', true)
   bass:new_seq(2, true, {4,3,1,3,1,1,1,1,1}, 1, 1, 'next')
   function bass:action(val)
