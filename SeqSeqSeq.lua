@@ -96,18 +96,19 @@ function Voice:new(on, ext_octave, ext_degree, level, octave, degree, transpose,
     ii.jf.play_note(note, level)
   end
 
+  o.on = on and true or false
+
   o.ext_octave = ext_octave and true or false
   o.ext_degree = ext_degree and true or false
 
-  o.scale = global.scale == nil and CV_SCALE or global.scale
-  o.negharm = global.negharm or false
-
-  o.on = on and true or false
-  o.octave_wrap = octave_wrap or false
   o.level = level or 1
   o.octave = octave or 0
   o.degree = degree or 1
   o.transpose = transpose or 0
+  o.octave_wrap = octave_wrap or false
+
+  o.scale = global.scale == nil and CV_SCALE or global.scale
+  o.negharm = global.negharm or false
 
   o.mod = {on = true, level = 1, octave = 0, degree = 1, transpose = 0}
 
