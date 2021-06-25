@@ -274,9 +274,8 @@ function on_clock()
   global.division = selector(txi.input[2], div.x2, 0, 4)
   global.negharm = selector(txi.input[3], {false,true}, 0, 4)
   global.count = global.division * new_chord.division * #new_chord.sequence * 4
-  --
-  metro[1].time = 60/global.bpm
 
+  metro[1].time = 60/global.bpm
   clock_reset(global.reset_count)
   clock_divider(global.division)
   global.reset = false
