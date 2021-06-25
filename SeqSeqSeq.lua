@@ -167,12 +167,12 @@ function divider(f)
     end
 end
 
-function round(n)
-  return n % 1 >= 0.5 and math.ceil(n) or math.floor(n)
-end
-
 function linlin(input, range_min, range_max, output_min, output_max)
   return (input - range_min) * (output_max - output_min) / (range_max - range_min) + output_min
+end
+
+function round(n)
+  return n % 1 >= 0.5 and math.ceil(n) or math.floor(n)
 end
 
 function clamper(input, min, max)
