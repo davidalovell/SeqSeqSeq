@@ -1,4 +1,5 @@
 --- SeqSeqSeq
+CV_SCALE = lydian
 
 ionian = {0,2,4,5,7,9,11}
 dorian = {0,2,3,5,7,9,10}
@@ -13,14 +14,10 @@ div = {
   , even = {1,2,4,6,8,10}
 }
 
-CV_SCALE = lydian
-CV_OCTAVE = 0
-CV_DEGREE = 1
-
 global = {
     bpm = 120
   , division = 1
-  , count = 0
+  , reset_count = 0
   , reset = false
 
   , on = true
@@ -29,11 +26,11 @@ global = {
   , degree = 1
   , transpose = 0
 
-  , scale = mixolydian
-  , negharm = false
+  , scale = mixolydian -- nil
+  , negharm = false -- nil
 }
 
-txi = {param = {}, input = {}}
+txi = {param = {}, input = {}} -- nil
 
 Voice = {}
 function Voice:new(on, ext_octave, ext_degree, level, octave, degree, transpose, synth)
@@ -69,11 +66,7 @@ function Voice:new(on, ext_octave, ext_degree, level, octave, degree, transpose,
     local on = (global.on == nil or global.on) and self.on and self.mod.on
     local note = self:new_note()
     local level = self.level * self.mod.level * global.level
-
     return on and self.synth(note, level)
-  end
-
-  o.action = function(self, val)
   end
 
   o.new_note = function(self)
@@ -82,8 +75,8 @@ function Voice:new(on, ext_octave, ext_degree, level, octave, degree, transpose,
     local scale = global.scale == nil and s.scale or global.scale
     local negharm = global.negharm == nil and s.negharm or global.negharm
 
-    local cv_degree = s.ext_degree and CV_DEGREE or 1
-    local cv_octave = s.ext_octave and CV_OCTAVE or 0
+    local cv_degree = s.ext_degree and global.cv_degree or 1
+    local cv_octave = s.ext_octave and global.cv_octave or 0
 
     local transpose = s.transpose + s.mod.transpose + global.transpose
     local degree = (s.degree - 1) + (s.mod.degree - 1) + (cv_degree - 1) + (global.degree - 1)
@@ -96,23 +89,19 @@ function Voice:new(on, ext_octave, ext_degree, level, octave, degree, transpose,
 
     return note / 12 + octave
   end
-
-  o.synth = synth or function(note, level)
-    ii.jf.play_note(note, level)
-  end
-
+  
+  o.on = on and true or false
   o.ext_octave = ext_octave and true or false
   o.ext_degree = ext_degree and true or false
-
-  o.scale = global.scale == nil and CV_SCALE or global.scale
-  o.negharm = global.negharm or false
-
-  o.on = on and true or false
   o.level = level or 1
   o.octave = octave or 0
   o.degree = degree or 1
   o.transpose = transpose or 0
+  o.synth = synth or function(note, level) ii.jf.play_note(note, level) end
 
+  o.scale = global.scale == nil and CV_SCALE or global.scale
+  o.negharm = global.negharm or false
+  
   o.mod = {on = true, level = 1, octave = 0, degree = 1, transpose = 0}
 
   return o
@@ -160,14 +149,12 @@ function Seq:new(on, sequence, division, step, behaviour, action)
     return (next and s.action ~= nil) and s.action(val) or val
   end
 
-  o.action = action or nil
-
-  o.sequence = sequence or {1,2,3,4}
-  o.behaviour = behaviour or 'next'
-
   o.on = on or true
+  o.sequence = sequence or {1,2,3,4}
   o.division = division or 1
   o.step = step or 1
+  o.behaviour = behaviour or 'next'
+  o.action = action or nil
 
   o.mod = {on = true, division = 1, step = 1}
 
@@ -209,8 +196,8 @@ function init()
   metro[1].time = 60/global.bpm
   metro[1]:start()
 
-  ii.wsyn.ar_mode(1)
   ii.jf.mode(1)
+  ii.wsyn.ar_mode(1)
 
   txi_getter()
 
@@ -219,7 +206,6 @@ function init()
   clock_divider = new_divider(function() output[1](pulse(0.01)) on_division() end)
 
   -- declare voices/sequencers/actions
-
 
   --
 end
@@ -239,40 +225,36 @@ ii.txi.event = function(e, val)
 end
 
 input[1].scale = function(s)
-  CV_OCTAVE = s.octave
-  CV_DEGREE = s.index
+  global.cv_octave = s.octave
+  global.cv_degree = s.index
 end
 
 input[2].change = function()
-  trigger_reset(global.count)
-
+  trigger_reset(global.reset_count)
+  
   -- voices/seqeuncers to play on trigger to crow input[2]
 
-
   --
-
+  
   global.reset = false
 end
 
 function on_clock()
-  clock_reset(global.count)
-
   txi_getter()
 
-  -- variables to be set on clock
-
+  -- variables to be set on clock, e.g.
 
   --
-
+  
   metro[1].time = 60/global.bpm
-  clock_divider(global.division)
 
+  clock_reset(global.reset_count)
+  clock_divider(global.division)
   global.reset = false
 end
 
 function on_division()
   -- voices/sequencers to play on every clock division
-
 
   --
 end
