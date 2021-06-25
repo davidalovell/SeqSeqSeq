@@ -1,10 +1,11 @@
 # SeqSeqSeq
-A customisable script for crow that can act both as a quantiser for external CV and create multiple sequencers which can be influenced by this. Notes are sent to Just Friends by default but this too is customisable. Parameters can be controlled by live coding in druid or by TXi.
+A customisable script for crow that can act as a CV quantiser and then create mutliple sequencers which can be influenced by this. Notes are sent to Just Friends by default but this too is customisable. Parameters can be controlled by live coding in druid or by TXi.
 
 Based on ...
 
 ## Requirements:
 - crow
+- written for crow firmware 2.20
 
 ## Recommended:
 - Just Friends
@@ -14,6 +15,10 @@ Based on ...
 
 ## Optional:
 - Any other ii capable module
+
+## Limitations
+- Script length - you can add around 40 lines of user code before the script becomes too long
+- However, additional voices/sequencers can be created in druid after the script is run
 
 ## Things:
 - scales
@@ -31,3 +36,5 @@ Based on ...
 - on_division (voices/sequencers to play on clock division)
 
 ## How to use:
+
+
