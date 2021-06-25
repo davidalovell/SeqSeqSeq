@@ -242,7 +242,6 @@ function on_clock()
 
   --
   metro[1].time = 60/global.bpm
-
   clock_reset(global.reset_count)
   clock_divider(global.division)
   global.reset = false
