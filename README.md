@@ -1,5 +1,5 @@
 # SeqSeqSeq
-A customisable script for crow that can act as a quantiser and/or create multiple sequencers. Notes are sent to Just Friends by default but this too is customisable. Parameters can be controlled by live coding in druid and/or by TXi.
+A customisable script for crow that can act both as a quantiser for external CV and create multiple sequencers which can be influenced by this. Notes are sent to Just Friends by default but this too is customisable. Parameters can be controlled by live coding in druid or by TXi.
 
 Based on ...
 
