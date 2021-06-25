@@ -59,8 +59,7 @@ function Voice:new(on, ext_octave, ext_degree, level, octave, degree, transpose,
     self:play_note()
   end
 
-  o.action = function(self, val)
-  end
+  o.action = function(self, val) end
 
   o.play_note = function(self)
     local on = (global.on == nil or global.on) and self.on and self.mod.on
