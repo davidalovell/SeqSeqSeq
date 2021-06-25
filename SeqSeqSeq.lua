@@ -176,7 +176,7 @@ function round(n)
 end
 
 function clamper(input, min, max)
-  return math.min(math.max(min, input), max)
+  return math.min( math.max( min, input ), max )
 end
 
 function selector(input, table, range_min, range_max, min, max)
