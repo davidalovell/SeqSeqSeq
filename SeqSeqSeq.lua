@@ -27,7 +27,7 @@ global = {
   , transpose = 0
 
   , scale = mixolydian -- nil
-  , negharm = false -- nil
+  , neg_harm = false -- nil
 }
 
 txi = {param = {}, input = {}} -- requires TXi
@@ -48,7 +48,7 @@ function Voice:new(on, ext_octave, ext_degree, level, octave, degree, transpose,
   o.synth = synth or function(note, level) ii.jf.play_note(note, level) end -- requires JF
 
   o.scale = global.scale == nil and CV_SCALE or global.scale
-  o.negharm = global.negharm or false
+  o.neg_harm = global.neg_harm or false
 
   o.mod = {on = true, level = 1, octave = 0, degree = 1, transpose = 0}
 
@@ -86,7 +86,7 @@ function Voice:new(on, ext_octave, ext_degree, level, octave, degree, transpose,
     local s = self
 
     local scale = global.scale == nil and s.scale or global.scale
-    local negharm = global.negharm == nil and s.negharm or global.negharm
+    local neg_harm = global.neg_harm == nil and s.neg_harm or global.neg_harm
 
     local cv_degree = s.ext_degree and global.cv_degree or 1
     local cv_octave = s.ext_octave and global.cv_octave or 0
@@ -97,8 +97,8 @@ function Voice:new(on, ext_octave, ext_degree, level, octave, degree, transpose,
     local index = degree % #scale + 1
 
     local note = scale[index] + transpose
-    local negative = (7 - note) % 12
-    note = negharm and negative or note
+    local neg = (7 - note) % 12
+    note = neg_harm and neg or note
 
     return note / 12 + octave
   end
