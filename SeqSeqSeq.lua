@@ -135,15 +135,13 @@ function Seq:new(on, sequence, division, step, behaviour, action)
       elseif s.behaviour == 'prev' then
         s.stepcount = ((s.stepcount - step) - 1) % #s.sequence + 1
       elseif s.behaviour == 'drunk' then
-        s.stepcount = ((s.stepcount + step * math.random(-1, 1)) - 1) % #s.sequence + 1
-        s.stepcount = clamper(s.stepcount, 1, #s.sequence)
+        s.stepcount = clamper( ( ( s.stepcount + step * math.random(-1, 1) ) - 1) % #s.sequence + 1 ), 1, #s.sequence )
       elseif s.behaviour == 'random' then
         s.stepcount = math.random(1, #s.sequence)
       end
     end
 
     s.reset = false
-
     local val = s.sequence[s.stepcount]
     return (next and s.action ~= nil) and s.action(val) or val
   end
