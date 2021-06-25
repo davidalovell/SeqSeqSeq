@@ -17,7 +17,7 @@ Based on ...
 - Any other ii capable module
 
 ## Limitations
-- Script length - you can add around 40 lines of user code before the script becomes too long
+- Script length - you can only add around 40 lines of user code before the script becomes too long
 - However, additional voices/sequencers can be created in druid after the script is run
 
 ## Things:
