@@ -1,5 +1,4 @@
 --- SeqSeqSeq
-
 CV_SCALE = lydian
 
 ionian = {0,2,4,5,7,9,11}
@@ -18,7 +17,7 @@ div = {
 global = {
     bpm = 120
   , division = 1
-  , count = 0
+  , reset_count = 0
   , reset = false
 
   , on = true
@@ -27,11 +26,11 @@ global = {
   , degree = 1
   , transpose = 0
 
-  , scale = mixolydian --nil
-  , negharm = false --nil
+  , scale = mixolydian -- nil
+  , negharm = false -- nil
 }
 
-txi = {param = {}, input = {}}
+txi = {param = {}, input = {}} -- nil
 
 Voice = {}
 function Voice:new(on, ext_octave, ext_degree, level, octave, degree, transpose, synth)
@@ -90,23 +89,19 @@ function Voice:new(on, ext_octave, ext_degree, level, octave, degree, transpose,
 
     return note / 12 + octave
   end
-
-  o.synth = synth or function(note, level)
-    ii.jf.play_note(note, level)
-  end
-
+  
+  o.on = on and true or false
   o.ext_octave = ext_octave and true or false
   o.ext_degree = ext_degree and true or false
-
-  o.scale = global.scale == nil and CV_SCALE or global.scale
-  o.negharm = global.negharm or false
-
-  o.on = on and true or false
   o.level = level or 1
   o.octave = octave or 0
   o.degree = degree or 1
   o.transpose = transpose or 0
+  o.synth = synth or function(note, level) ii.jf.play_note(note, level) end
 
+  o.scale = global.scale == nil and CV_SCALE or global.scale
+  o.negharm = global.negharm or false
+  
   o.mod = {on = true, level = 1, octave = 0, degree = 1, transpose = 0}
 
   return o
@@ -154,14 +149,12 @@ function Seq:new(on, sequence, division, step, behaviour, action)
     return (next and s.action ~= nil) and s.action(val) or val
   end
 
-  o.action = action or nil
-
-  o.sequence = sequence or {1,2,3,4}
-  o.behaviour = behaviour or 'next'
-
   o.on = on or true
+  o.sequence = sequence or {1,2,3,4}
   o.division = division or 1
   o.step = step or 1
+  o.behaviour = behaviour or 'next'
+  o.action = action or nil
 
   o.mod = {on = true, division = 1, step = 1}
 
@@ -212,42 +205,9 @@ function init()
   trigger_reset = new_divider(function() global.reset = true end)
   clock_divider = new_divider(function() output[1](pulse(0.01)) on_division() end)
 
-  ii.jf.run_mode(1)
-  ii.jf.run(5)
-  output[2](lfo(8,5,'sine'))
+  -- declare voices/sequencers/actions
 
-  triads = {{1,3,5}, {2,4,6}, {3,5,7}, {4,6,1}, {5,7,2}, {6,1,3}, {7,2,4}}
-
-  new_chord = Seq:new(true, {1,5,4,1}, 24, 1, 'next')
-
-  arp = Voice:new(true, false, false, 0.75, 0, 1, 0)
-  arp:new_seq(1, true, {1}, 3, 1, 'next', true)
-  arp:new_seq(2, true, {1,2,3}, 4, 1, 'prev')
-  arp:new_seq(3, true, {4,1,1,3,1}, 1, 1, 'next')
-  function arp:action(val)
-    self.seq[1].sequence = triads[chord]
-    self.seq[1].sequence[4] = self.seq[1].sequence[self:play_seq(2)] + math.random(0,1) * 7
-    self.seq[1].mod.division = self:play_seq(3)
-    self.mod.degree = val
-  end
-
-  arp2 = Voice:new(true, false, false, 0.5, 0, 5, 0)
-  arp2:new_seq(1, true, {1}, 2, 2, 'next', true)
-  arp2:new_seq(2, true, {6,4,1,1}, 1, 1, 'next')
-  function arp2:action(val)
-    self.seq[1].sequence = triads[chord]
-    self.seq[1].mod.division = self:play_seq(2)
-    self.mod.degree = val + math.random(-1,0) * 7
-  end
-
-  bass = Voice:new(true, false, false, 1, -2, 1, 0, function(note, level) ii.jf.play_voice(1, note, level) end)
-  bass:new_seq(1, true, {1,1,1}, 6, 1, 'next', true)
-  bass:new_seq(2, true, {4,3,1}, 1, 1, 'next')
-  function bass:action(val)
-    self.seq[1].sequence[3] = triads[chord][3] + math.random(-1,1)
-    self.seq[1].mod.division = self:play_seq(2)
-    self.mod.degree = val + (triads[chord][1] - 1)
-  end
+  --
 end
 
 function txi_getter()
@@ -270,28 +230,31 @@ input[1].scale = function(s)
 end
 
 input[2].change = function()
-  trigger_reset(global.count)
+  trigger_reset(global.reset_count)
+  
+  -- voices/seqeuncers to play on trigger to crow input[2]
 
+  --
+  
   global.reset = false
 end
 
 function on_clock()
   txi_getter()
 
-  global.bpm = linlin(txi.input[1], 0, 5, 10, 3000)
-  global.division = selector(txi.input[2], div.x2, 0, 4)
-  global.negharm = selector(txi.input[3], {false,true}, 0, 4)
-  global.count = global.division * new_chord.division * #new_chord.sequence * 4
+  -- variables to be set on clock, e.g.
+
+  --
+  
   metro[1].time = 60/global.bpm
 
-  clock_reset(global.count)
+  clock_reset(global.reset_count)
   clock_divider(global.division)
   global.reset = false
 end
 
 function on_division()
-  chord = new_chord:play_seq()
-  arp:play_seq()
-  arp2:play_seq()
-  bass:play_seq()
+  -- voices/sequencers to play on every clock division
+
+  --
 end
