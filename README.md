@@ -7,7 +7,7 @@ A sequencer for crow
 ## Recommended:
 - Just Friends
 - TXi
-- (script requires some small changes without these)
+(script requires some small changes without these)
 
 ## Optional:
 - Any other ii capable module
