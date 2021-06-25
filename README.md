@@ -13,3 +13,5 @@ Things:
 - on_clock (variables to be set on on clock)
 - input[2].change (voices/sequencers to play on trigger)
 - on_division (voices/sequencers to play on clock division)
+
+How to use:
