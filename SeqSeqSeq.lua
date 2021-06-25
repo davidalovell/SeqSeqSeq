@@ -30,7 +30,7 @@ global = {
   , negharm = false -- nil
 }
 
-txi = {param = {}, input = {}} -- nil
+txi = {param = {}, input = {}} -- requires TXi
 
 Voice = {}
 function Voice:new(on, ext_octave, ext_degree, level, octave, degree, transpose, synth)
@@ -96,7 +96,7 @@ function Voice:new(on, ext_octave, ext_degree, level, octave, degree, transpose,
   o.octave = octave or 0
   o.degree = degree or 1
   o.transpose = transpose or 0
-  o.synth = synth or function(note, level) ii.jf.play_note(note, level) end
+  o.synth = synth or function(note, level) ii.jf.play_note(note, level) end -- requires JF
 
   o.scale = global.scale == nil and CV_SCALE or global.scale
   o.negharm = global.negharm or false
