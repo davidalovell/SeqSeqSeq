@@ -1,7 +1,18 @@
 # SeqSeqSeq
 A sequencer for crow
 
-Things:
+## Requirements:
+- crow
+
+## Recommended:
+- Just Friends
+- TXi
+- (script requires some small changes without these)
+
+## Optional:
+- Any other ii capable module
+
+## Things:
 - scales
 - divisions
 - global settings
@@ -16,4 +27,4 @@ Things:
 - input[2].change (voices/sequencers to play on trigger)
 - on_division (voices/sequencers to play on clock division)
 
-How to use:
+## How to use:
