@@ -158,7 +158,7 @@ function Seq:new(on, sequence, division, step, behaviour, action)
   return o
 end
 
-function new_divider(f)
+function divider(f)
   local divcount = 0
   return
     function(division)
@@ -167,12 +167,12 @@ function new_divider(f)
     end
 end
 
-function linlin(input, range_min, range_max, output_min, output_max)
-  return (input - range_min) * (output_max - output_min) / (range_max - range_min) + output_min
-end
-
 function round(n)
   return n % 1 >= 0.5 and math.ceil(n) or math.floor(n)
+end
+
+function linlin(input, range_min, range_max, output_min, output_max)
+  return (input - range_min) * (output_max - output_min) / (range_max - range_min) + output_min
 end
 
 function clamper(input, min, max)
@@ -198,9 +198,9 @@ function init()
 
   txi_getter()
 
-  clock_reset = new_divider(function() global.reset = true end)
-  trigger_reset = new_divider(function() global.reset = true end)
-  clock_divider = new_divider(function() output[1](pulse(0.01)) on_division() end)
+  clock_reset = divider(function() global.reset = true end)
+  trigger_reset = divider(function() global.reset = true end)
+  clock_divider = divider(function() output[1](pulse(0.01)) on_division() end)
 
   -- declare voices/sequencers/actions
 
