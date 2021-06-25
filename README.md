@@ -2,7 +2,9 @@
 A sequencer for crow
 
 Things:
-- global variables
+- scales
+- divisions
+- global settings
 - Voice object
 - Seq object
 - divider
