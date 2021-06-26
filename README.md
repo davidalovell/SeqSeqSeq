@@ -54,9 +54,10 @@ Voice:new_seq(id, on, sequence, division, step, behaviour, action)
   -- step:        number of steps advance, defaults to 1
   -- behaviour:   'next', 'prev', 'drunk', 'random', defaults to 'next'
   -- action:      options:
-  --                no argument, or nil   -   sequencer returns a value
-  --                true                  -   sequencer plays the voice
-  --                function              -   pass a custom function
+  --                no argument, or nil     -   sequencer returns a value
+  --                true                    -   sequencer plays the voice
+  --                pass a custom function  -   e.g.
+                                                function(self, val) self.mod.step = val end
 ```
 Examples:
 ```lua
