@@ -57,7 +57,7 @@ Voice:new_seq(id, on, sequence, division, step, behaviour, action)
   --              no argument, or nil     -   sequencer returns a value
   --              true                    -   sequencer plays the voice
   --              pass a custom function  -   e.g.
-                                              function(self, val) self.mod.step = val end
+                                              function(self, val) global.bpm = val end
 ```
 Examples:
 ```lua
