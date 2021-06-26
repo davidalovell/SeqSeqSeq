@@ -47,7 +47,7 @@ cv_keyboard_voice_contstraned_to_one_octave = Voice:new(true, false, true, 1, 0,
 ```lua
 Voice:new_seq(id, on, sequence, division, step, behaviour, action)
 -- arguments:
-  -- id:          each sequencer should be given an id, typically this should be numeric but could be a string
+  -- id:          each sequencer should be given an id, typically 
   -- on:          is the sequencer enabled?, (true/false), defaults to true
   -- sequence:    defaults to {1,2,3,4}
   -- division:    clock divider for sequencer, defaults to 1
