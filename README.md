@@ -35,7 +35,7 @@ Voice:new(on, ext_octave, ext_degree, level, octave, degree, transpose, synth)
   -- synth:       function to play synth, defaults to:
                   function(note, level) ii.jf.play_note(note, level) end  
 ```
-Examples of how to create voices:
+Examples:
 ```lua
 my_voice = Voice:new()
 jf_voice_transposed_by_a_fifth = Voice:new(true, false, false, 1, 0, 5, 0)
@@ -53,8 +53,19 @@ Voice:new_seq(id, on, sequence, division, step, behaviour, action)
   -- division:    clock divider for sequencer, defaults to 1
   -- step:        number of steps advance, defaults to 1
   -- behaviour:   'next', 'prev', 'drunk', 'random', defaults to 'next'
+  -- action:      options:
+  --                no argument, or nil   -   sequencer returns a value
+  --                true                  -   sequencer plays the voice
+  --                function              -   pass a custom function
 ```
-
+Examples:
+```lua
+my_voice:new_seq(1)
+my_voice:new_seq(2, false, false, 1, 0, 5, 0)
+wsyn_voice_two_octaves_up = Voice:new(true, false, false, 1, 2, 1, 0, function(note, level) ii.wsyn.play_note(note, level) end)
+cv_keyboard_voice = Voice:new(true, true, true, 1, 0, 1, 0)
+cv_keyboard_voice_contstraned_to_one_octave = Voice:new(true, false, true, 1, 0, 1, 0)
+```
 
 
 ### Sequencers
