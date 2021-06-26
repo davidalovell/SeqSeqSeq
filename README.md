@@ -21,7 +21,7 @@ Based on ...
 - However, additional voices/sequencers can be created in druid after the script is run
 
 ## Getting started:
-### Voice
+### Creating Voices
 ```lua
 Voice:new(on, ext_octave, ext_degree, level, octave, degree, transpose, synth)
 -- arguments:
