@@ -21,8 +21,7 @@ Based on ...
 - However, additional voices/sequencers can be created in druid after the script is run
 
 ## Getting started:
-### Typical usage
-#### 1. Create Voices
+### 1. Create Voices
 ```lua
 Voice:new(on, ext_octave, ext_degree, level, octave, degree, transpose, synth)
 -- arguments:
@@ -44,7 +43,7 @@ wsyn_voice_two_octaves_up = Voice:new(true, false, false, 1, 2, 1, 0, function(n
 cv_keyboard_voice = Voice:new(true, true, true, 1, 0, 1, 0)
 cv_keyboard_voice_contstraned_to_one_octave = Voice:new(true, false, true, 1, 0, 1, 0)
 ```
-#### 2. Attach sequencers to Voices
+### 2. Attach sequencers to Voices
 ```lua
 Voice:new_seq(id, on, sequence, division, step, behaviour, action)
 ```
