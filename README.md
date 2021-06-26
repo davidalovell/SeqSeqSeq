@@ -35,9 +35,10 @@ Voice:new(on, ext_octave, ext_degree, level, octave, degree, transpose, synth)
   
   other available properties:
   -- scale:       chosen scale, (list of scales at start of script), defaults to the scale set by CV_SCALE at top of script
-                  (Set CV_SCALE to the scale setting of your external sequencer)
+  --              (Set CV_SCALE to the scale setting of your external sequencer)
                   CV_SCALE = lydian
                   CV_SCALE = {0,2,3,5,7,8,10}
+                  
   -- neg_harm:    transforms note to negative harmony equivalent, (true/false), defaults to false
   
   modulation properties:
