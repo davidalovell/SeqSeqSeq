@@ -25,20 +25,16 @@ Based on ...
 ```lua
 Voice:new(on, ext_octave, ext_degree, level, octave, degree, transpose, synth)
 ```
-arguments:
-| property |   |   | default |
-| on: | is the voice enabled?| (true/false) | defaults to true |
-| ext_octave: | octave transposition based on external CV to input[1] | (true/false) | defaults to false |
-| ext_degree: |   diatonic transposition based on external CV to input[1], (true/false), defaults to false
-
-
-
-  -- level:         volume level, defaults to 1
-  -- octave:        octave, defaults to 0
-  -- degree:        scale degree, 1 based (i.e. 1 is 1st degree, 2 is 2nd etc.), defaults to 1
-  -- transpose:     transposition in semitones, 0 based (i.e. 0 is no transposition, 7 is transposition by 7 semitones etc.), defaults 0
-  -- synth:         function to play synth (send ii message or set outputs to create CV/gate information), defaults to:
-                    function(note, level) ii.jf.play_note(note, level) end  
+-- arguments:
+  -- on:          is the voice enabled?, (true/false), defaults to true
+  -- ext_octave:  octave transposition based on external CV to input[1], (true/false), defaults to false
+  -- ext_degree:  diatonic transposition based on external CV to input[1], (true/false), defaults to false
+  -- level:       volume level, defaults to 1
+  -- octave:      octave, defaults to 0
+  -- degree:      scale degree, 1 based (i.e. 1 is 1st degree, 2 is 2nd etc.), defaults to 1
+  -- transpose:   transposition in semitones, 0 based (i.e. 0 is no transposition, 7 is transposition by 7 semitones etc.), defaults 0
+  -- synth:       function to play synth (send ii message or set outputs to create CV/gate information), defaults to:
+                  function(note, level) ii.jf.play_note(note, level) end  
 
 
 Examples of how to create voices:
