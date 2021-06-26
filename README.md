@@ -24,27 +24,27 @@ Based on ...
 ```lua
 Voice:new(on, ext_octave, ext_degree, level, octave, degree, transpose, synth)
 -- arguments:
-  -- on:          is the voice enabled?, (true/false), defaults to true
-  -- ext_octave:  octave transposition based on external CV to input[1], (true/false), defaults to false
-  -- ext_degree:  diatonic transposition based on external CV to input[1], (true/false), defaults to false
-  -- level:       volume level, defaults to 1
-  -- octave:      octave, defaults to 0
-  -- degree:      scale degree, 1 based (i.e. 1 is 1st degree, 2 is 2nd etc.), defaults to 1
-  -- transpose:   transposition in semitones, 0 based (i.e. 0 is no transposition, 7 is transposition by 7 semitones etc.), defaults 0
-  -- synth:       function to play synth (send ii message or set outputs to create CV/gate information), defaults to:
-                  function(note, level) ii.jf.play_note(note, level) end
+  -- on:            is the voice enabled?, (true/false), defaults to true
+  -- ext_octave:    octave transposition based on external CV to input[1], (true/false), defaults to false
+  -- ext_degree:    diatonic transposition based on external CV to input[1], (true/false), defaults to false
+  -- level:         volume level, defaults to 1
+  -- octave:        octave, defaults to 0
+  -- degree:        scale degree, 1 based (i.e. 1 is 1st degree, 2 is 2nd etc.), defaults to 1
+  -- transpose:     transposition in semitones, 0 based (i.e. 0 is no transposition, 7 is transposition by 7 semitones etc.), defaults 0
+  -- synth:         function to play synth (send ii message or set outputs to create CV/gate information), defaults to:
+                    function(note, level) ii.jf.play_note(note, level) end
   
 -- other available properties:
-  -- scale:       chosen scale, (list of scales at start of script), defaults to the scale set by CV_SCALE at top of script                  
-  -- neg_harm:    transforms note to negative harmony equivalent, (true/false), defaults to false
+  -- scale:         chosen scale, (list of scales at start of script), defaults to the scale set by CV_SCALE at top of script                  
+  -- neg_harm:      transforms note to negative harmony equivalent, (true/false), defaults to false
   
 -- modulation properties:
   -- create sequencers to modulate these properties without affecting the main properties above
-  -- mod.on:
-  -- mod.level:ts
-  -- mod.octave:
-  -- mod.degree:
-  -- mod.transpose: 
+  -- mod.on:        all 'on' properties need to be true for the Voice to play
+  -- mod.level:     multiplies with other 'level' properties
+  -- mod.octave:    adds to other 'octave' properties
+  -- mod.degree:    adds to other 'degree' properties
+  -- mod.transpose: adds to other 'transpose' properties
   
   
 
