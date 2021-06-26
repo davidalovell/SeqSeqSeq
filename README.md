@@ -43,7 +43,7 @@ wsyn_voice_two_octaves_up = Voice:new(true, false, false, 1, 2, 1, 0, function(n
 cv_keyboard_voice = Voice:new(true, true, true, 1, 0, 1, 0)
 cv_keyboard_voice_contstraned_to_one_octave = Voice:new(true, false, true, 1, 0, 1, 0)
 ```
-### 2. Create sequencers to linked to voices
+### 2. Create sequencers within the voices
 ```lua
 Voice:new_seq(id, on, sequence, division, step, behaviour, action)
 -- arguments:
@@ -57,18 +57,22 @@ Voice:new_seq(id, on, sequence, division, step, behaviour, action)
   --                no argument, or nil     -   sequencer returns a value
   --                true                    -   sequencer plays the voice
   --                pass a custom function  -   e.g.
-                                                function(self, val) global.bpm = val end
+                                                function(val) global.bpm = val end
 ```
 Examples:
 ```lua
+my_voice:new_seq(1, true, {1,2,1,3}, 1, 1, 'next', true)
+my_voice:new_seq(2, true, {true, false, true}, 4, 1, 'next')
 my_voice:new_seq(1)
-my_voice:new_seq(2, false, false, 1, 0, 5, 0)
-wsyn_voice_two_octaves_up = Voice:new(true, false, false, 1, 2, 1, 0, function(note, level) ii.wsyn.play_note(note, level) end)
-cv_keyboard_voice = Voice:new(true, true, true, 1, 0, 1, 0)
-cv_keyboard_voice_contstraned_to_one_octave = Voice:new(true, false, true, 1, 0, 1, 0)
 ```
-
-
+### 3. Create actions within the voices to play the sequencers
+```lua
+function my_voice:action(val)
+  self.mod.degree = val
+  self.mod.on = self:play_seq(2)
+  self.mod.division = self:play_seq(3)
+end
+```
 ### Sequencers
 Create standalone sequencers 
 ```lua
