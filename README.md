@@ -33,8 +33,19 @@ Voice:new(on, ext_octave, ext_degree, level, octave, degree, transpose, synth)
   -- degree:        scale degree, 1 based (i.e. 1 is 1st degree, 2 is 2nd etc.), defaults to 1
   -- transpose:     transposition in semitones, 0 based (i.e. 0 is no transposition, 7 is transposition by 7 semitones etc.), defaults 0
   -- synth:         function to play synth (send ii message or set outputs to create CV/gate information), defaults to:
-                    function(note, level) ii.jf.play_note(note, level) end
-  
+                    function(note, level) ii.jf.play_note(note, level) end  
+```
+
+Examples of how to create voices:
+```lua
+my_voice = Voice:new()
+jf_voice_transposed_by_a_fifth = Voice:new(true, false, false, 1, 0, 5, 0)
+wsyn_voice_two_octaves_up = Voice:new(true, false, false, 1, 2, 1, 0, function(note, level) ii.wsyn.play_note(note, level) end)
+cv_keyboard_voice = Voice:new(true, true, true, 1, 0, 1, 0)
+cv_keyboard_voice_contstraned_to_one_octave = Voice:new(true, false, true, 1, 0, 1, 0)
+```
+
+```lua
 -- other available properties:
   -- scale:         chosen scale, (list of scales at start of script), defaults to the scale set by CV_SCALE at top of script                  
   -- neg_harm:      transforms note to negative harmony equivalent, (true/false), defaults to false
@@ -46,17 +57,6 @@ Voice:new(on, ext_octave, ext_degree, level, octave, degree, transpose, synth)
   -- mod.octave:    adds to other 'octave' properties
   -- mod.degree:    adds to other 'degree' properties
   -- mod.transpose: adds to other 'transpose' properties
-  
-```
-
-Examples of how to create voices:
-```lua
-my_voice = Voice:new()
-jf_voice_transposed_by_a_fifth = Voice:new(true, false, false, 1, 0, 5, 0)
-wsyn_voice_two_octaves_up = Voice:new(true, false, false, 1, 2, 1, 0, function(note, level) ii.wsyn.play_note(note, level) end)
-cv_keyboard_voice = Voice:new(true, true, true, 1, 0, 1, 0)
-cv_keyboard_voice_contstraned_to_one_octave = Voice:new(true, false, true, 1, 0, 1, 0)
-
 ```
 
 This creates a new Voice called `myvoice`. 
