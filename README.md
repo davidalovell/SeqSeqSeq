@@ -56,6 +56,7 @@ Voice:new_seq(id, on, sequence, division, step, behaviour, action)
   -- action:      options:
   --                no argument, or nil     -   sequencer returns a value
   --                true                    -   sequencer plays the voice
+                                            -   (you can choose to create several sequences within the voice with action = true for some polymetric patterns)
   --                pass a custom function  -   e.g.
                                                 function(val) global.bpm = val end
 ```
@@ -73,7 +74,8 @@ function my_voice:action(val)
   self.mod.division = self:play_seq(3)
 end
 ```
-This is the action attached to the voice. 
+If a sequencer that has been created has action = true (see above) then this function will be played when the sequencer is called. As you can see you can make it do whatever you want. 
+
 ### 4. Standalone sequencers
 Create standalone sequencers 
 ```lua
