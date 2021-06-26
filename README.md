@@ -34,11 +34,7 @@ Voice:new(on, ext_octave, ext_degree, level, octave, degree, transpose, synth)
                   function(note, level) ii.jf.play_note(note, level) end
   
   other available properties:
-  -- scale:       chosen scale, (list of scales at start of script), defaults to the scale set by CV_SCALE at top of script
-  --              (Set CV_SCALE to the scale setting of your external sequencer)
-                  CV_SCALE = lydian
-                  CV_SCALE = {0,2,3,5,7,8,10}
-                  
+  -- scale:       chosen scale, (list of scales at start of script), defaults to the scale set by CV_SCALE at top of script                  
   -- neg_harm:    transforms note to negative harmony equivalent, (true/false), defaults to false
   
   modulation properties:
@@ -56,6 +52,10 @@ This creates a new Voice called `myvoice`.
 
 ```lua
 myvoices:
+
+  --              (Set CV_SCALE to the scale setting of your external sequencer)
+                  CV_SCALE = lydian
+                  CV_SCALE = {0,2,3,5,7,8,10}
 ``
 
 
