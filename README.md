@@ -21,6 +21,10 @@ Based on ...
 - However, additional voices/sequencers can be created in druid after the script is run
 
 ## Getting started:
+```lua
+myvoice = Voice:new(true, true, true, 1, 0, 1, 0)
+```
+This creates a new Voice called `myvoice`
 
 
 ## Reference:
