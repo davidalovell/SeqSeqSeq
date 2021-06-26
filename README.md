@@ -22,9 +22,35 @@ Based on ...
 
 ## Getting started:
 ```lua
-myvoice = Voice:new(true, true, true, 1, 0, 1, 0)
+Voice:new(on, ext_octave, ext_degree, level, octave, degree, transpose, synth)
+  -- on:          is the voice enabled? (true/false)
+  -- ext_octave:  octave transposition based on external CV to input[1] (true/false)
+  -- ext_degree:  diatonic transposition based on external CV to input[1] (true/false)
+  -- level        volume level
+  -- octave      
+  -- degree
+  -- transpose
+  -- synth:       defaults to:
+                  function(note, level) ii.jf.play_note(note, level) end
+  
+  other available properties:
+  -- scale:
+  -- neg_harm: 
+  
+  modulation properties:
+  -- mod.on:
+  -- mod.level:
+  -- mod.octave:
+  -- mod.degree:
+  -- mod.transpose: 
+  
+
 ```
-This creates a new Voice called `myvoice`
+This creates a new Voice called `myvoice`. 
+
+```lua
+myvoices:
+``
 
 
 ## Reference:
