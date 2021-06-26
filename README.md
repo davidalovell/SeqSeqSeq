@@ -46,9 +46,18 @@ Voice:new(on, ext_octave, ext_degree, level, octave, degree, transpose, synth)
   -- mod.degree:    adds to other 'degree' properties
   -- mod.transpose: adds to other 'transpose' properties
   
-  
+```
+
+Examples of how to create voices:
+```lua
+my_voice = Voice:new()
+jf_voice_transposed_by_a_fifth = Voice:new(true, false, false, 1, 0, 5, 0)
+wsyn_voice_two_octaves_up = Voice:new(true, false, false, 1, 2, 1, 0, function(note, level) ii.wsyn.play_note(note, level) end)
+cv_keyboard_voice = Voice:new(true, true, true, 1, 0, 1, 0)
+cv_keyboard_voice_contstraned_to_one_octave = Voice:new(true, false, true, 1, 0, 1, 0)
 
 ```
+
 This creates a new Voice called `myvoice`. 
 
 ```lua
