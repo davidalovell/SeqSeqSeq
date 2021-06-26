@@ -23,7 +23,7 @@ Based on ...
 ## Getting started:
 ```lua
 Voice:new(on, ext_octave, ext_degree, level, octave, degree, transpose, synth)
-  arguments:
+-- arguments:
   -- on:          is the voice enabled?, (true/false), defaults to true
   -- ext_octave:  octave transposition based on external CV to input[1], (true/false), defaults to false
   -- ext_degree:  diatonic transposition based on external CV to input[1] (true/false), defaults to false
@@ -34,11 +34,11 @@ Voice:new(on, ext_octave, ext_degree, level, octave, degree, transpose, synth)
   -- synth:       function to play synth (send ii message or set outputs to create CV/gate information), defaults to:
                   function(note, level) ii.jf.play_note(note, level) end
   
-  other available properties:
+-- other available properties:
   -- scale:       chosen scale, (list of scales at start of script), defaults to the scale set by CV_SCALE at top of script                  
   -- neg_harm:    transforms note to negative harmony equivalent, (true/false), defaults to false
   
-  modulation properties:
+-- modulation properties:
   -- create sequencers to modulate these properties without affecting the main properties above
   -- mod.on:
   -- mod.level:ts
