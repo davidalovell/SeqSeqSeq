@@ -26,7 +26,7 @@ Voice:new(on, ext_octave, ext_degree, level, octave, degree, transpose, synth)
 -- arguments:
   -- on:          is the voice enabled?, (true/false), defaults to true
   -- ext_octave:  octave transposition based on external CV to input[1], (true/false), defaults to false
-  -- ext_degree:  diatonic transposition based on external CV to input[1] (true/false), defaults to false
+  -- ext_degree:  diatonic transposition based on external CV to input[1], (true/false), defaults to false
   -- level:       volume level, defaults to 1
   -- octave:      octave, defaults to 0
   -- degree:      scale degree, 1 based (i.e. 1 is 1st degree, 2 is 2nd etc.), defaults to 1
