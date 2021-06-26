@@ -63,7 +63,7 @@ Examples:
 ```lua
 my_voice:new_seq(1, true, {1,2,1,3}, 1, 1, 'next', true)
 my_voice:new_seq(2, true, {true, false, true}, 4, 1, 'next')
-my_voice:new_seq(1)
+my_voice:new_seq(3)
 ```
 ### 3. Create actions within the voices to play the sequencers
 ```lua
@@ -73,7 +73,8 @@ function my_voice:action(val)
   self.mod.division = self:play_seq(3)
 end
 ```
-### Sequencers
+This is the action attached to the voice. 
+### 4. Standalone sequencers
 Create standalone sequencers 
 ```lua
 Seq:new(on, sequence, division, step, behaviour, action)
