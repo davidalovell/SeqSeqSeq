@@ -23,6 +23,7 @@ Based on ...
 ## Getting started:
 ```lua
 Voice:new(on, ext_octave, ext_degree, level, octave, degree, transpose, synth)
+  arguments:
   -- on:          is the voice enabled?, (true/false), defaults to true
   -- ext_octave:  octave transposition based on external CV to input[1], (true/false), defaults to false
   -- ext_degree:  diatonic transposition based on external CV to input[1] (true/false), defaults to false
