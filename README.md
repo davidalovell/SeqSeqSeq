@@ -24,6 +24,7 @@ Based on ...
 ### Creating Voices
 ```lua
 Voice:new(on, ext_octave, ext_degree, level, octave, degree, transpose, synth)
+```
 -- arguments:
   -- on:            is the voice enabled?, (true/false), defaults to true
   -- ext_octave:    octave transposition based on external CV to input[1], (true/false), defaults to false
@@ -34,7 +35,7 @@ Voice:new(on, ext_octave, ext_degree, level, octave, degree, transpose, synth)
   -- transpose:     transposition in semitones, 0 based (i.e. 0 is no transposition, 7 is transposition by 7 semitones etc.), defaults 0
   -- synth:         function to play synth (send ii message or set outputs to create CV/gate information), defaults to:
                     function(note, level) ii.jf.play_note(note, level) end  
-```
+
 
 Examples of how to create voices:
 ```lua
