@@ -33,7 +33,7 @@ Voice:new(on, ext_octave, ext_degree, level, octave, degree, transpose, synth)
   -- octave:      octave, defaults to 0
   -- degree:      scale degree, 1 based (i.e. 1 is 1st degree, 2 is 2nd etc.), defaults to 1
   -- transpose:   transposition in semitones, 0 based (i.e. 0 is no transposition, 7 is transposition by 7 semitones etc.), defaults 0
-  -- synth:       function to play synth (send ii message or set outputs to create CV/gate information), defaults to:
+  -- synth:       function to play synth, defaults to:
                   function(note, level) ii.jf.play_note(note, level) end  
 ```
 
