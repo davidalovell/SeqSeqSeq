@@ -272,8 +272,8 @@ function on_clock()
 
   global.bpm = linlin(txi.input[1], 0, 5, 10, 3000)
   global.division = selector(txi.input[2], div.x2, 0, 4)
-  global.negharm = selector(txi.input[3], {false,true}, 0, 4)
-  global.count = global.division * new_chord.division * #new_chord.sequence * 4
+  global.neg_harm = selector(txi.input[3], {false,true}, 0, 4)
+  global.reset_count = global.division * new_chord.division * #new_chord.sequence * 4
 
   metro[1].time = 60/global.bpm
   clock_reset(global.reset_count)
