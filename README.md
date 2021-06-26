@@ -23,14 +23,14 @@ Based on ...
 ## Getting started:
 ```lua
 Voice:new(on, ext_octave, ext_degree, level, octave, degree, transpose, synth)
-  -- on:          is the voice enabled? (true/false)
-  -- ext_octave:  octave transposition based on external CV to input[1] (true/false)
-  -- ext_degree:  diatonic transposition based on external CV to input[1] (true/false)
-  -- level        volume level
-  -- octave      
-  -- degree
-  -- transpose
-  -- synth:       defaults to:
+  -- on:          is the voice enabled? (true/false), defaults to true
+  -- ext_octave:  octave transposition based on external CV to input[1] (true/false), defaults to false
+  -- ext_degree:  diatonic transposition based on external CV to input[1] (true/false), defaults to false
+  -- level:       volume level, defaults to 1
+  -- octave:      defaults to 0
+  -- degree:      1 based (i.e. 1 is 1st degree, 2 is 2nd etc.), defaults to 1
+  -- transpose:   0 based (i.e. 0 is no transposition, 7 is transposition by 7 semitones etc.), defaults 0
+  -- synth:       function to play synth or create CV/gate, defaults to:
                   function(note, level) ii.jf.play_note(note, level) end
   
   other available properties:
@@ -38,6 +38,7 @@ Voice:new(on, ext_octave, ext_degree, level, octave, degree, transpose, synth)
   -- neg_harm: 
   
   modulation properties:
+  -- create sequencers to modulate these properties without affecting the main properties above
   -- mod.on:
   -- mod.level:
   -- mod.octave:
