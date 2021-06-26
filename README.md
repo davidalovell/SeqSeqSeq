@@ -44,7 +44,7 @@ wsyn_voice_two_octaves_up = Voice:new(true, false, false, 1, 2, 1, 0, function(n
 cv_keyboard_voice = Voice:new(true, true, true, 1, 0, 1, 0)
 cv_keyboard_voice_contstraned_to_one_octave = Voice:new(true, false, true, 1, 0, 1, 0)
 ```
-
+Other details:
 ```lua
 -- other available properties:
   -- scale:         chosen scale, (list of scales at start of script), defaults to the scale set by CV_SCALE at top of script                  
