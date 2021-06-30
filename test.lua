@@ -42,14 +42,12 @@ function Voice:_pos() return self.scale[ self:_degree() % #self.scale + 1 ] + se
 function Voice:_neg() return ( 7 - self:_pos() ) % 12 end
 function Voice:_note() return ( self.neg_harm and self:_neg() or self:_pos() ) / 12 + self:_octave() end
 
-function Voice:play_note() return self:_on() and self.synth( self:_note(), self:_level() ) end
 function Voice:action(val) end
+function Voice:play_note() return self:_on() and self.synth( self:_note(), self:_level() ) end
 function Voice:play_voice(val)
   self:action(val)
   self:play_note()
 end
-
-
 
 Seq = {}
 function Seq:new(args)
