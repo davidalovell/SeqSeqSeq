@@ -9,8 +9,6 @@ global = {
   , cv_octave = 0
 }
 
-
-
 Voice = {}
 function Voice:new(args)
   local o = setmetatable( {}, {__index = Voice} )
@@ -74,9 +72,10 @@ end
 function Seq:_on() return self.on and self.mod.on end
 function Seq:_division() return self.division * self.mod.division end
 function Seq:_step() return self.step * self.mod.step end
+function Seq:_action(val) end
 
-function Seq:_div_iterate() return s.div_count % s:_division() + 1 end
-function Seq:_step_iterate() return s:_on() and (s.div_count == 1) end
+function Seq:_div_iterate() return self:_on() and self.div_count % self:_division() + 1 end
+function Seq:_step_iterate() return self:_on() and (self.div_count == 1) end
 
 function Seq:_step_behaviour()
   local s = self
@@ -94,12 +93,12 @@ end
 function Seq:play_seq()
   local s = self
 
-  s.div_count = s.reset and 1 or s:_div_iterate()
-  s.step_count = s.reset and 0 or s:_step_iterate() and s:_step_behaviour() or s.step_count
+  s.div_count = s.reset and 1 or s:_div_iterate() or s.div_count
+  s.step_count = s.reset and 1 or s:_step_iterate() and s:_step_behaviour() or s.step_count
   s.reset = false
   
   local val = s.sequence[s.step_count]
-  return (s:_step_iterate() and s.action ~= nil) and s.action(val) or val
+  return s:_step_iterate() and s.action == nil and val or s.action(val)
 end
 
 
