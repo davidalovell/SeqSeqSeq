@@ -107,26 +107,3 @@ end
 function round(input)
   return input % 1 >= 0.5 and math.ceil(input) or math.floor(input)
 end
-
-function init()
-  input[1].mode('scale', CV_SCALE)
-  input[2].mode('change', 4, 0.1, 'rising')
-
-  ii.jf.mode(1)
-  ii.wsyn.ar_mode(1)
-
-  vox = Voice:new()
-  sec = Seq:new{sequence = {1,2,3,4}, divisions = 2}
-end
-
-input[1].scale = function(s)
-  global.cv_octave = s.octave
-  global.cv_degree = s.index
-end
-
-input[2].change = function()
-  vox.mod.degree = global.cv_degree
-  vox.mod.octave = global.cv_octave
-  vox:play_note()
-  print(sec:play_seq())
-end
