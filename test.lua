@@ -65,8 +65,8 @@ function Seq:new(args)
 
   o.mod = {on = true, division = 1, step = 1}
 
-  o.divcount = 0
-  o.stepcount = 0
+  o.div_count = 0
+  o.step_count = 0
   o.reset = false
 
   return o
@@ -75,31 +75,32 @@ end
 function Seq:_on() return self.on and self.mod.on end
 function Seq:_division() return self.division * self.mod.division end
 function Seq:_step() return self.step * self.mod.step end
-function Seq:_divcount() return s.divcount % s:_division() + 1 end
-function Seq:_stepcount()
+
+function Seq:_div_iterate() return s.div_count % s:_division() + 1 end
+function Seq:_step_iterate() return s:_on() and (s.div_count == 1) end
+
+function Seq:_step_behaviour()
   local s = self
   if s.behaviour == 'next' then
-    return ( ( s.stepcount + s:_step() ) - 1 ) % #s.sequence + 1
+    return ( ( s.step_count + s:_step() ) - 1 ) % #s.sequence + 1
   elseif s.behaviour == 'prev' then
-    return ( ( s.stepcount - s:_step() ) - 1 ) % #s.sequence + 1
+    return ( ( s.step_count - s:_step() ) - 1 ) % #s.sequence + 1
   elseif s.behaviour == 'drunk' then
-    return clamper( ( (s.stepcount + s:_step() * math.random(-1, 1) ) - 1 ) % #s.sequence + 1, 1, #s.sequence )
+    return clamper( ( (s.step_count + s:_step() * math.random(-1, 1) ) - 1 ) % #s.sequence + 1, 1, #s.sequence )
   elseif s.behaviour == 'random' then
     return math.random(1, #s.sequence)
   end
 end
-function Seq:_advance() return s:_on() and (s.divcount == 1) end
-
 
 function Seq:play_seq()
   local s = self
 
-  s.divcount = s.reset and 1 or s:_divcount()
-  s.stepcount = s.reset and 0 or s:_advance() and s:_stepcount() or s.stepcount
-
+  s.div_count = s.reset and 1 or s:_div_iterate()
+  s.step_count = s.reset and 0 or s:_step_iterate() and s:_step_behaviour() or s.step_count
   s.reset = false
-  local val = s.sequence[s.stepcount]
-  return (s:_advance() and s.action ~= nil) and s.action(val) or val
+  
+  local val = s.sequence[s.step_count]
+  return (s:_step_iterate() and s.action ~= nil) and s.action(val) or val
 end
 
 
