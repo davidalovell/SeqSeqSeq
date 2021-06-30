@@ -1,3 +1,5 @@
+--SeqSeqSeq
+
 lydian = {0,2,4,6,7,9,11}
 
 CV_SCALE = lydian
@@ -46,6 +48,21 @@ function Voice:play_voice(val)
   self:play_note()
 end
 
+-- function Voice:new_seq(id, on, sequence, division, step, behaviour, action)
+--   action = (action and function(val) self:play_voice(val) end) or (type(action) == 'function' and action)
+--   self.seq[id] = Seq:new(on, sequence, division, step, behaviour, action)
+-- end
+--
+-- function Voice:play_seq(id)
+--   if id == nil then
+--     for k, v in pairs(self.seq) do
+--       local play = self.seq[k].action and self.seq[k]:play_seq()
+--     end
+--   else
+--     return self.seq[id]:play_seq()
+--   end
+-- end
+
 Seq = {}
 function Seq:new(args)
   local o = setmetatable( {}, {__index = Seq} )
@@ -70,10 +87,9 @@ end
 function Seq:_on() return self.on and self.mod.on end
 function Seq:_division() return self.division * self.mod.division end
 function Seq:_step() return self.step * self.mod.step end
-function Seq:_action(val) end
 
 function Seq:_div_adv() return self:_on() and self.div_count % self:_division() + 1 end
-function Seq:_step_adv() return self:_on() and self.div_count == 1 end
+function Seq:_step_adv() return self:_on() and self.div_count == 1 and self:_behaviour() end
 
 function Seq:_behaviour()
   return self.behaviour == 'next' and ( (self.step_count + self.step) - 1 ) % #self.sequence + 1
@@ -83,11 +99,13 @@ function Seq:_behaviour()
     or self.stepcount
 end
 
+function Seq:_val() return self.sequence[self.step_count] end
+
 function Seq:play_seq()
   self.div_count = self.reset and 1 or self:_div_adv() or self.div_count
-  self.step_count = self.reset and 1 or self:_step_adv() and self:_behaviour() or self.step_count
+  self.step_count = self.reset and 1 or self:_step_adv() or self.step_count
   self.reset = false
-  return self:_step_adv() and self.action == nil and self.sequence[self.step_count] or self.action( self.sequence[self.step_count] )
+  return self:_step_adv() and self.action ~= nil and self.action( self:_val() ) or self:_val()
 end
 
 function selector(input, table, range_min, range_max, min, max)
@@ -116,7 +134,7 @@ function init()
   ii.wsyn.ar_mode(1)
 
   vox = Voice:new()
-  sec = Seq:new{sequence = {1,2,3,4}, divisions = 2}
+  sec = Seq:new{sequence = {1,2,3,4}, division = 2, action = function(val) print(val .. '!') end}
 end
 
 input[1].scale = function(s)
