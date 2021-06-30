@@ -26,6 +26,7 @@ function Voice:new(args)
   o.mod = {on = true, level = 1, octave = 0, degree = 1, transpose = 0}
 
   o.seq = {}
+  o.seq_count = 0
 
   return o
 end
@@ -40,7 +41,7 @@ function Voice:_pos() return self.scale[ self:_degree() % #self.scale + 1 ] + se
 function Voice:_neg() return ( 7 - self:_pos() ) % 12 end
 function Voice:_note() return ( self.neg_harm and self:_neg() or self:_pos() ) / 12 + self:_octave() end
 
-function Voice:action(val) end
+function Voice:action(val) self.mod.degree = val end
 function Voice:play_note() return self:_on() and self.synth( self:_note(), self:_level() ) end
 
 function Voice:play_voice(val)
@@ -48,10 +49,12 @@ function Voice:play_voice(val)
   self:play_note()
 end
 
--- function Voice:new_seq(id, on, sequence, division, step, behaviour, action)
---   action = (action and function(val) self:play_voice(val) end) or (type(action) == 'function' and action)
---   self.seq[id] = Seq:new(on, sequence, division, step, behaviour, action)
--- end
+function Voice:new_seq(args)
+  local t = args or {}
+  t.action = t.action ~= nil and t.action == 'play_voice' and function(val) self:play_voice(val) end or t.action
+  self.seq_count = self.seq_count + 1
+  self.seq[ self.seq_count ] = Seq:new(t)
+end
 --
 -- function Voice:play_seq(id)
 --   if id == nil then
