@@ -26,7 +26,6 @@ function Voice:new(args)
   o.mod = {on = true, level = 1, octave = 0, degree = 1, transpose = 0}
 
   o.seq = {}
-  o.seq_count = 0
 
   return o
 end
@@ -52,19 +51,19 @@ end
 function Voice:new_seq(args)
   local t = args or {}
   t.action = t.action ~= nil and t.action == 'play_voice' and function(val) self:play_voice(val) end or t.action
-  self.seq_count = self.seq_count + 1
-  self.seq[ self.seq_count ] = Seq:new(t)
+  t.id = t.id == nil and #self.seq + 1 or t.id
+  self.seq[ t.id ] = Seq:new(t)
 end
---
--- function Voice:play_seq(id)
---   if id == nil then
---     for k, v in pairs(self.seq) do
---       local play = self.seq[k].action and self.seq[k]:play_seq()
---     end
---   else
---     return self.seq[id]:play_seq()
---   end
--- end
+
+function Voice:play_seq(id)
+  if id == nil then
+    for k, v in pairs(self.seq) do
+      local play = self.seq[k].action and self.seq[k]:play_seq()
+    end
+  else
+    return self.seq[id]:play_seq()
+  end
+end
 
 function Voice:reset()
   for k, v in pairs(self.seq) do
@@ -116,8 +115,8 @@ function Seq:play_seq()
 end
 
 function Seq:reset()
-  self.div_count = 1
-  self.step_count = 1
+  self.div_count = 0
+  self.step_count = 0
 end
 
 function selector(input, table, range_min, range_max, min, max)
@@ -144,7 +143,7 @@ function reset(...)
   end
 end
 
-function set(property, val, ...}
+function set(property, val, ...)
   for k, v in pairs{...} do
     _G[v][property] = val
   end
