@@ -115,12 +115,6 @@ function Seq:_behaviour()
     or self.stepcount
 end
 
--- function Seq:_behaviour() return self['_' .. self.behaviour](self) end
--- function Seq:_next() return ( (self.step_count + self.step) - 1 ) % #self.sequence + 1 end
--- function Seq:_prev() return ( (self.step_count - self.step) - 1 ) % #self.sequence + 1 end
--- function Seq:_drunk() return clamper( ( (self.step_count + self.step * math.random(-1, 1) ) - 1 ) % #self.sequence + 1, 1, #self.sequence ) end
--- function Seq:_random() return math.random(1, #self.sequence) end
-
 function Seq:_val() return self.sequence[self.step_count] end
 
 function Seq:play_seq()
