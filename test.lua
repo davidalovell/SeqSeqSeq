@@ -66,6 +66,12 @@ end
 --   end
 -- end
 
+function Voice:reset()
+  for k, v in pairs(self.seq) do
+    self.seq[k]:reset(self)
+  end
+end
+
 Seq = {}
 function Seq:new(args)
   local o = setmetatable( {}, {__index = Seq} )
@@ -82,7 +88,6 @@ function Seq:new(args)
 
   o.div_count = 0
   o.step_count = 0
-  o.reset = false
 
   return o
 end
@@ -105,10 +110,14 @@ end
 function Seq:_val() return self.sequence[self.step_count] end
 
 function Seq:play_seq()
-  self.div_count = self.reset and 1 or self:_div_adv() or self.div_count
-  self.step_count = self.reset and 1 or self:_step_adv() or self.step_count
-  self.reset = false
+  self.div_count = self:_div_adv() or self.div_count
+  self.step_count = self:_step_adv() or self.step_count
   return self:_step_adv() and self.action ~= nil and self.action( self:_val() ) or self:_val()
+end
+
+function Seq:reset()
+  self.div_count = 1
+  self.step_count = 1
 end
 
 function selector(input, table, range_min, range_max, min, max)
@@ -127,6 +136,18 @@ end
 
 function round(input)
   return input % 1 >= 0.5 and math.ceil(input) or math.floor(input)
+end
+
+function reset(...)
+  for k, v in pairs{...} do
+    _G[v]:reset()
+  end
+end
+
+function set(property, val, ...}
+  for k, v in pairs{…} do
+    _G[v][property] = val
+  end
 end
 
 function init()
