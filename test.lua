@@ -161,12 +161,32 @@ end
 function init()
   input[1].mode('scale', global.cv_scale)
   input[2].mode('change', 4, 0.1, 'rising')
+  
+  txi_getter()
+  
+  metro[1].event = on_clock
+  metro[1].time = 60/global.bpm
+  metro[1]:start()
 
   ii.jf.mode(1)
   ii.wsyn.ar_mode(1)
 
   vox = Voice:new()
   vox:new_seq{id = 1, sequence = {1,2,3,4}, division = 2, action = function(val) print(val .. '!') end}
+end
+
+function txi_getter()
+  if txi then
+    for i = 1, 4 do
+      ii.txi.get('param', i)
+      ii.txi.get('in', i)
+    end
+  end
+end
+
+ii.txi.event = function(e, val)
+  e.name = e.name == 'in' and 'input' or e.name
+  txi[e.name][e.arg] = val
 end
 
 input[1].scale = function(s)
@@ -179,4 +199,13 @@ input[2].change = function()
   vox.mod.octave = global.cv_octave
   vox:play_note()
   print(sec:play_seq())
+end
+
+function on_clock()
+  txi_getter()
+  metro[1].time = 60/global.bpm
+end
+
+function on_division()
+  output[1](pulse(0.01))
 end
