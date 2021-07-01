@@ -2,6 +2,12 @@
 
 lydian = {0,2,4,6,7,9,11}
 
+div = {
+    x2 = {1,2,4,8,16,32,64}
+  , odd = {1,3,5,7,9}
+  , even = {1,2,4,6,8,10}
+}
+
 global = {
     cv_scale = lydian
   , cv_degree = 1
