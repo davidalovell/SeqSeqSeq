@@ -171,8 +171,10 @@ function init()
   metro[1].time = 60/global.bpm
   metro[1]:start()
 
-  clock_divider = Seq:new{action = function(val) output[1](pulse(0.01)); on_division() end}
-  
+  clock_divider = Seq:new{action = function() output[1](pulse(0.01)); on_division() end}
+  clock_reset = Seq:new{division = 128, action = function() reset('clock_divider') end}
+    
+  --
   
 end
 
@@ -201,12 +203,14 @@ end
 function on_clock()
   txi_getter()
   
-  global.bpm = linlin(txi.input[1], 0, 5, 10, 3000)
-  metro[1].time = 60/global.bpm
-  
-  --global.neg_harm = selector(txi.input[3], {false,true}, 0, 4)
-  
+  global.bpm = linlin(txi.input[1], 0, 5, 10, 3000)  
   clock_divider.division = selector(txi.input[2], div.x2, 0, 4)
+  -- global.neg_harm = selector(txi.input[3], {false,true}, 0, 4)
+  
+  clock_reset.division = 128
+    
+  metro[1].time = 60/global.bpm
+  clock_reset:play_seq()
   clock_divider:play_seq()
 end
 
