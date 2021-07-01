@@ -201,11 +201,15 @@ end
 function on_clock()
   txi_getter()
   
+  global.bpm = linlin(txi.input[1], 0, 5, 10, 3000)
   metro[1].time = 60/global.bpm
-  clock_divider.division = 2
   
+  --global.neg_harm = selector(txi.input[3], {false,true}, 0, 4)
+  
+  clock_divider.division = selector(txi.input[2], div.x2, 0, 4)
   clock_divider:play_seq()
 end
 
 function on_division()
 end
+
