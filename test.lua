@@ -145,7 +145,7 @@ function reset(...)
 end
 
 function set(property, val, ...}
-  for k, v in pairs{…} do
+  for k, v in pairs{...} do
     _G[v][property] = val
   end
 end
