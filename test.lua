@@ -6,7 +6,11 @@ global = {
     cv_scale = lydian
   , cv_degree = 1
   , cv_octave = 0
+  
+  , bpm = 60
 }
+
+txi = {param = {}, input = {}} -- requires TXi
 
 Voice = {}
 function Voice:new(args)
