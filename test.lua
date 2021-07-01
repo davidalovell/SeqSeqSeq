@@ -68,7 +68,7 @@ end
 
 function Voice:reset()
   for k, v in pairs(self.seq) do
-    self.seq[k]:reset(self)
+    self.seq[k]:reset()
   end
 end
 
