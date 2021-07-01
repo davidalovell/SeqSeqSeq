@@ -161,18 +161,19 @@ end
 function init()
   input[1].mode('scale', global.cv_scale)
   input[2].mode('change', 4, 0.1, 'rising')
-  
+
+  ii.jf.mode(1)
+  ii.wsyn.ar_mode(1)
+
   txi_getter()
   
   metro[1].event = on_clock
   metro[1].time = 60/global.bpm
   metro[1]:start()
 
-  ii.jf.mode(1)
-  ii.wsyn.ar_mode(1)
-
-  vox = Voice:new()
-  vox:new_seq{id = 1, sequence = {1,2,3,4}, division = 2, action = function(val) print(val .. '!') end}
+  clock_divider = Seq:new{action = function(val) output[1](pulse(0.01)); on_division() end}
+  
+  
 end
 
 function txi_getter()
@@ -195,17 +196,16 @@ input[1].scale = function(s)
 end
 
 input[2].change = function()
-  vox.mod.degree = global.cv_degree
-  vox.mod.octave = global.cv_octave
-  vox:play_note()
-  print(sec:play_seq())
 end
 
 function on_clock()
   txi_getter()
+  
   metro[1].time = 60/global.bpm
+  clock_divider.division = 2
+  
+  clock_divider:play_seq()
 end
 
 function on_division()
-  output[1](pulse(0.01))
 end
