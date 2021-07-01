@@ -2,10 +2,9 @@
 
 lydian = {0,2,4,6,7,9,11}
 
-CV_SCALE = lydian
-
 global = {
-    cv_degree = 1
+    cv_scale = lydian
+  , cv_degree = 1
   , cv_octave = 0
 }
 
@@ -19,7 +18,7 @@ function Voice:new(args)
   o.octave = t.octave == nil and 0 or t.octave
   o.degree = t.degree == nil and 1 or t.degree
   o.transpose = t.transpose == nil and 0 or t.transpose
-  o.scale = t.scale == nil and CV_SCALE or t.scale
+  o.scale = t.scale == nil and global.cv_scale or t.scale
   o.neg_harm = t.neg_harm == nil and false or t.neg_harm
   o.synth = t.synth == nil and function(note, level) ii.jf.play_note(note, level) end or t.synth
 
@@ -150,7 +149,7 @@ function round(input)
 end
 
 function init()
-  input[1].mode('scale', CV_SCALE)
+  input[1].mode('scale', global.cv_scale)
   input[2].mode('change', 4, 0.1, 'rising')
 
   ii.jf.mode(1)
