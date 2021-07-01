@@ -119,6 +119,18 @@ function Seq:reset()
   self.step_count = 0
 end
 
+function reset(...) -- make option to pass in table
+  for k, v in pairs{...} do
+    _G[v]:reset()
+  end
+end
+
+function set(property, val, ...) -- make option to pass in table
+  for k, v in pairs{...} do
+    _G[v][property] = val
+  end
+end
+
 function selector(input, table, range_min, range_max, min, max)
   min = min or 1
   max = max or #table
@@ -137,18 +149,6 @@ function round(input)
   return input % 1 >= 0.5 and math.ceil(input) or math.floor(input)
 end
 
-function reset(...)
-  for k, v in pairs{...} do
-    _G[v]:reset()
-  end
-end
-
-function set(property, val, ...)
-  for k, v in pairs{...} do
-    _G[v][property] = val
-  end
-end
-
 function init()
   input[1].mode('scale', CV_SCALE)
   input[2].mode('change', 4, 0.1, 'rising')
@@ -157,7 +157,7 @@ function init()
   ii.wsyn.ar_mode(1)
 
   vox = Voice:new()
-  sec = Seq:new{sequence = {1,2,3,4}, division = 2, action = function(val) print(val .. '!') end}
+  vox:new_seq{id = 1, sequence = {1,2,3,4}, division = 2, action = function(val) print(val .. '!') end}
 end
 
 input[1].scale = function(s)
