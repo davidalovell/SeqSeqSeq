@@ -181,7 +181,7 @@ function init()
   metro[1].time = 60/global.bpm
   metro[1]:start()
 
-  clock_reset = Seq:new{division = 64, action = function() reset('clock_divider', 'one', 'two')end}
+  clock_reset = Seq:new{division = 64, action = function() clock_divider:reset(); reset('one', 'two') end}
   clock_divider = Seq:new{action = function() output[1](pulse(0.01)); on_division() end}
 
   one = Voice:new()
