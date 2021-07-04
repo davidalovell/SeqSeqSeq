@@ -63,7 +63,7 @@ end
 
 function Voice:new_seq(args)
   local t = args or {}
-  t.action = t.action ~= nil and t.action == 'play_voice' and function(val) self:play_voice(val) end or t.action
+  t.action = type(t.action) == ‘function’ and t.action or t.action and function(val) self:play_voice(val) end
   t.id = t.id == nil and #self.seq + 1 or t.id
   self.seq[ t.id ] = Seq:new(t)
 end
