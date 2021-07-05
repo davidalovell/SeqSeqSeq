@@ -35,7 +35,7 @@ function Voice:new(args)
   o.scale = t.scale == nil and global.cv_scale or t.scale
   o.neg_harm = t.neg_harm == nil and false or t.neg_harm
   o.synth = t.synth == nil and function(note, level) ii.jf.play_note(note, level) end or t.synth
-  o.action = t.action == nil and function(self, val) self.mod.degree = val end or t.action
+  o.action = t.action == nil and function(self, val) end or t.action
 
   o.mod = {on = true, level = 1, octave = 0, degree = 1, transpose = 0}
 
@@ -54,7 +54,6 @@ function Voice:_pos() return self.scale[ self:_degree() % #self.scale + 1 ] + se
 function Voice:_neg() return ( 7 - self:_pos() ) % 12 end
 function Voice:_note() return ( self.neg_harm and self:_neg() or self:_pos() ) / 12 + self:_octave() end
 
--- function Voice:action(val) self.mod.degree = val end
 function Voice:play_note() return self:_on() and self.synth( self:_note(), self:_level() ) end
 
 function Voice:play_voice(val)
@@ -133,21 +132,36 @@ function Seq:reset()
   self.step_count = 0
 end
 
-function reset(...)
-  for k, v in pairs{...} do
+function reset(args)
+  args = type(args) == 'table' and args or {args}
+  for k, v in pairs(args) do
     _G[v]:reset()
   end
 end
 
-function set(property, val, ...)
-  for k, v in pairs{...} do
-    _G[v][property] = val
+function play_seq(args)
+  args = type(args) == 'table' and args or {args}
+  for k, v in pairs(args) do
+    _G[v]:play_seq()
+  end
+end
+
+function play_voice(args)
+  args = type(args) == 'table' and args or {args}
+  for k, v in pairs(args) do
+    _G[v]:play_voice()
   end
 end
 
 function play(method, ...)
   for k, v in pairs{...} do
     _G[v][method](_G[v])
+  end
+end
+
+function set(property, val, ...)
+  for k, v in pairs{...} do
+    _G[v][property] = val
   end
 end
 
@@ -182,16 +196,35 @@ function init()
   metro[1].time = 60/global.bpm
   metro[1]:start()
 
-  clock_reset = Seq:new{division = 64, action = function() clock_divider:reset(); reset('one', 'two') end}
+  voices = {'one', 'two'}
+
+  clock_reset = Seq:new{division = 256, action = function() clock_divider:reset(); reset(voices) end}
   clock_divider = Seq:new{action = function() output[1](pulse(0.01)); on_division() end}
 
-  one = Voice:new()
+  one = Voice:new{
+    action = function(self, val)
+      self.mod.degree = (global.cv_degree - 1) + val
+      self.seq[1].mod.division = self:play_seq(2)
+    end
+  }
   one:new_seq{id = 1, sequence = {1,3,5,7}, action = true, division = 2}
-  function one:action(val) self.mod.degree = (global.cv_degree - 1) + val end
+  one:new_seq{id = 2, sequence = {1,2,1,2}, division = 1}
 
-  two = Voice:new{octave = 1, degree = 3, level = 0.5}
-  two:new_seq{id = 1, sequence = {1,3,5,6}, action = true, division = 3}
-  function two:action(val) self.mod.degree = (global.cv_degree - 1) + val end
+  two = Voice:new{octave = 1, degree = 3, level = 0.5,
+    action = function(self, val)
+      self.mod.degree = (global.cv_degree - 1) + val
+      self.seq[1].mod.division = self:play_seq(2)
+    end
+  }
+  two:new_seq{id = 1, sequence = {1,2,5,7,0}, action = true, division = 3}
+  two:new_seq{id = 2, sequence = {1,1,4}, division = 1}
+
+  bass = Voice:new{octave = -4, level = 2,
+    action = function(self)
+      self.mod.degree = global.cv_degree
+      self.mod.octave = global.cv_octave
+    end
+  }
 
 end
 
@@ -215,7 +248,7 @@ input[1].scale = function(s)
 end
 
 input[2].change = function()
-  play('play_seq', nil)
+  play_voice('bass')
 end
 
 function on_clock()
@@ -232,5 +265,5 @@ function on_clock()
 end
 
 function on_division()
-  play('play_seq', 'one', 'two')
+  play_seq(voices)
 end
