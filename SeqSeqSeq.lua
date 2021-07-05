@@ -14,10 +14,10 @@ div = {
 }
 
 global = {
+  bpm = 60,
   cv_scale = lydian,
   cv_degree = 1,
-  cv_octave = 0,
-  bpm = 60
+  cv_octave = 0
 }
 
 txi = {param = {}, input = {}}
