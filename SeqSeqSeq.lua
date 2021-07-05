@@ -64,8 +64,7 @@ end
 function Voice:new_seq(args)
   local t = args or {}
   t.action = type(t.action) == 'function' and t.action or t.action and function(val) self:play_voice(val) end
-  t.id = t.id == nil and #self.seq + 1 or t.id
-  self.seq[ t.id ] = Seq:new(t)
+  self.seq[ t.id == nil and #self.seq + 1 or t.id ] = Seq:new(t)
 end
 
 function Voice:play_seq(id)
@@ -150,21 +149,21 @@ function selector(input, table, range_min, range_max, min, max)
   return table[ clamper( round( linlin( input, range_min, range_max, min, max ) ), min, max ) ]
 end
 
-function set(objects, property, val)
-  for k, v in pairs(objects) do
+function set(names, property, val)
+  for k, v in pairs(names) do
     _G[v][property] = val
   end
 end
 
-function do_method(objects, method)
-  for k, v in pairs(objects) do
+function do_method(names, method)
+  for k, v in pairs(names) do
     _G[v][method](_G[v])
   end
 end
 
-function play_seq(objects) do_method(objects, 'play_seq') end
-function play_voice(objects) do_method(objects, 'play_voice') end
-function reset(objects) do_method(objects, 'reset') end
+function play_seq(names) do_method(names, 'play_seq') end
+function play_voice(names) do_method(names, 'play_voice') end
+function reset(names) do_method(names, 'reset') end
 
 function txi_getter()
   if txi then
@@ -176,8 +175,7 @@ function txi_getter()
 end
 
 ii.txi.event = function(e, val)
-  e.name = e.name == 'in' and 'input' or e.name
-  txi[e.name][e.arg] = val
+  txi[ e.name == 'in' and 'input' or e.name ][ e.arg ] = val
 end
 
 function init()
@@ -196,7 +194,7 @@ function init()
   clock_reset = Seq:new{division = 256, action = function() clock_divider:reset() reset(voices) end}
   clock_divider = Seq:new{action = function() output[1](pulse(0.01)) on_division() end}
 
-  voices = {'one', 'two'}
+  voices = {'one', 'two', 'three', 'four'}
 
   one = Voice:new{
     action = function(self, val)
@@ -215,6 +213,27 @@ function init()
   }
   two:new_seq{id = 1, sequence = {1,2,5,7,0}, action = true, division = 3}
   two:new_seq{id = 2, sequence = {1,1,4}, division = 1}
+
+  three = Voice:new{octave = 1,
+    action = function(self, val)
+      self.mod.degree = (global.cv_degree - 1) + val
+      self.seq[1].mod.division = self:play_seq(2)
+    end
+  }
+  three:new_seq{id = 1, sequence = {1,2,3,4,5}, action = true, division = 3, behaviour = 'drunk'}
+  three:new_seq{id = 2, sequence = {1,2,3,4}, division = 1, behaviour = 'random'}
+
+  four = Voice:new{octave = 1, degree = 5, level = 0.5,
+    synth = function(note, level)
+      ii.wsyn.play_note(note, level)
+    end,
+    action = function(self, val)
+      self.mod.degree = (global.cv_degree - 1) + val
+      self.seq[1].mod.division = self:play_seq(2)
+    end
+  }
+  four:new_seq{id = 1, sequence = {1,2,5,7,0}, action = true, division = 2, behaviour = 'prev'}
+  four:new_seq{id = 2, sequence = {1,1,4}, division = 1}
 
   bass = Voice:new{octave = -4, level = 2,
     action = function(self)
