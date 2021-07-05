@@ -8,16 +8,16 @@ mixolydian = {0,2,4,5,7,9,10}
 aeolian = {0,2,3,5,7,8,10}
 
 div = {
-    x2 = {1,2,4,8,16,32,64}
-  , odd = {1,3,5,7,9}
-  , even = {1,2,4,6,8,10}
+  x2 = {1,2,4,8,16,32,64},
+  odd = {1,3,5,7,9},
+  even = {1,2,4,6,8,10}
 }
 
 global = {
-    cv_scale = lydian
-  , cv_degree = 1
-  , cv_octave = 0
-  , bpm = 60
+  cv_scale = lydian,
+  cv_degree = 1,
+  cv_octave = 0,
+  bpm = 60
 }
 
 txi = {param = {}, input = {}}
@@ -132,37 +132,16 @@ function Seq:reset()
   self.step_count = 0
 end
 
-function reset(args)
-  args = type(args) == 'table' and args or {args}
-  for k, v in pairs(args) do
-    _G[v]:reset()
-  end
+function round(input)
+  return input % 1 >= 0.5 and math.ceil(input) or math.floor(input)
 end
 
-function play_seq(args)
-  args = type(args) == 'table' and args or {args}
-  for k, v in pairs(args) do
-    _G[v]:play_seq()
-  end
+function clamper(input, min, max)
+  return math.min( math.max( min, input ), max )
 end
 
-function play_voice(args)
-  args = type(args) == 'table' and args or {args}
-  for k, v in pairs(args) do
-    _G[v]:play_voice()
-  end
-end
-
-function play(method, ...)
-  for k, v in pairs{...} do
-    _G[v][method](_G[v])
-  end
-end
-
-function set(property, val, ...)
-  for k, v in pairs{...} do
-    _G[v][property] = val
-  end
+function linlin(input, range_min, range_max, output_min, output_max)
+  return (input - range_min) * (output_max - output_min) / (range_max - range_min) + output_min
 end
 
 function selector(input, table, range_min, range_max, min, max)
@@ -171,16 +150,34 @@ function selector(input, table, range_min, range_max, min, max)
   return table[ clamper( round( linlin( input, range_min, range_max, min, max ) ), min, max ) ]
 end
 
-function linlin(input, range_min, range_max, output_min, output_max)
-  return (input - range_min) * (output_max - output_min) / (range_max - range_min) + output_min
+function set(objects, property, val)
+  for k, v in pairs(objects) do
+    _G[v][property] = val
+  end
 end
 
-function clamper(input, min, max)
-  return math.min( math.max( min, input ), max )
+function do_method(objects, method)
+  for k, v in pairs(objects) do
+    _G[v][method](_G[v])
+  end
 end
 
-function round(input)
-  return input % 1 >= 0.5 and math.ceil(input) or math.floor(input)
+function play_seq(objects) do_method(objects, 'play_seq') end
+function play_voice(objects) do_method(objects, 'play_voice') end
+function reset(objects) do_method(objects, 'reset') end
+
+function txi_getter()
+  if txi then
+    for i = 1, 4 do
+      ii.txi.get('param', i)
+      ii.txi.get('in', i)
+    end
+  end
+end
+
+ii.txi.event = function(e, val)
+  e.name = e.name == 'in' and 'input' or e.name
+  txi[e.name][e.arg] = val
 end
 
 function init()
@@ -196,10 +193,10 @@ function init()
   metro[1].time = 60/global.bpm
   metro[1]:start()
 
-  voices = {'one', 'two'}
+  clock_reset = Seq:new{division = 256, action = function() clock_divider:reset() reset(voices) end}
+  clock_divider = Seq:new{action = function() output[1](pulse(0.01)) on_division() end}
 
-  clock_reset = Seq:new{division = 256, action = function() clock_divider:reset(); reset(voices) end}
-  clock_divider = Seq:new{action = function() output[1](pulse(0.01)); on_division() end}
+  voices = {'one', 'two'}
 
   one = Voice:new{
     action = function(self, val)
@@ -225,21 +222,6 @@ function init()
       self.mod.octave = global.cv_octave
     end
   }
-
-end
-
-function txi_getter()
-  if txi then
-    for i = 1, 4 do
-      ii.txi.get('param', i)
-      ii.txi.get('in', i)
-    end
-  end
-end
-
-ii.txi.event = function(e, val)
-  e.name = e.name == 'in' and 'input' or e.name
-  txi[e.name][e.arg] = val
 end
 
 input[1].scale = function(s)
@@ -248,16 +230,15 @@ input[1].scale = function(s)
 end
 
 input[2].change = function()
-  play_voice('bass')
+  play_voice{'bass'}
 end
 
 function on_clock()
   txi_getter()
-  output[1](pulse(0.01))
 
   global.bpm = linlin(txi.input[1], 0, 5, 10, 3000)
   clock_divider.division = selector(txi.input[2], div.x2, 0, 4)
-  set('neg_harm', selector(txi.input[3], {false,true}, 0, 4), 'one', 'two')
+  set(voices, 'neg_harm', selector(txi.input[3], {false,true}, 0, 4) )
 
   metro[1].time = 60/global.bpm
   clock_reset:play_seq()
