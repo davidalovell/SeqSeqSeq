@@ -71,7 +71,7 @@ my_voice = Voice:new{               -- play Just Friends first voice
 
 my_voice = Voice:new{               -- creates a voice you can play with your external CV source into input[1]
   action = function(self, val)
-    self.mod.degree = val + (CV_degree - 1) -- (subtract 1 from CV_degree as this is 1-based)
+    self.mod.degree = val + (CV_degree - 1) -- (subtract 1 from CV_degree as degree is 1-based)
     self.mod.octave = val + CV_octave
   end
 }
