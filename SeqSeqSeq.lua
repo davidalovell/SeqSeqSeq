@@ -13,12 +13,11 @@ div = {
   even = {1,2,4,6,8,10}
 }
 
-global = {
-  bpm = 60,
-  cv_scale = lydian,
-  cv_degree = 1,
-  cv_octave = 0
-}
+CV_scale = lydian
+CV_degree = 1
+CV_octave = 0
+
+bpm = 60
 
 txi = {param = {}, input = {}}
 
@@ -32,7 +31,7 @@ function Voice:new(args)
   o.octave = t.octave == nil and 0 or t.octave
   o.degree = t.degree == nil and 1 or t.degree
   o.transpose = t.transpose == nil and 0 or t.transpose
-  o.scale = t.scale == nil and global.cv_scale or t.scale
+  o.scale = t.scale == nil and CV_scale or t.scale
   o.neg_harm = t.neg_harm == nil and false or t.neg_harm
   o.synth = t.synth == nil and function(note, level) ii.jf.play_note(note, level) end or t.synth
   o.action = t.action == nil and function(self, val) end or t.action
@@ -131,13 +130,8 @@ function Seq:reset()
   self.step_count = 0
 end
 
-function round(input)
-  return input % 1 >= 0.5 and math.ceil(input) or math.floor(input)
-end
-
-function clamper(input, min, max)
-  return math.min( math.max( min, input ), max )
-end
+function round(input) return input % 1 >= 0.5 and math.ceil(input) or math.floor(input) end
+function clamper(input, min, max) return math.min( math.max( min, input ), max ) end
 
 function linlin(input, range_min, range_max, output_min, output_max)
   return (input - range_min) * (output_max - output_min) / (range_max - range_min) + output_min
@@ -155,18 +149,14 @@ function set(names, property, val)
   end
 end
 
-function do_method(names, method)
+function act(method, names)
   for k, v in pairs(names) do
     _G[v][method](_G[v])
   end
 end
 
-function play_seq(names) do_method(names, 'play_seq') end
-function play_voice(names) do_method(names, 'play_voice') end
-function reset(names) do_method(names, 'reset') end
-
 function init()
-  input[1].mode('scale', global.cv_scale)
+  input[1].mode('scale', CV_scale)
   input[2].mode('change', 4, 0.1, 'rising')
 
   ii.jf.mode(1)
@@ -175,17 +165,30 @@ function init()
   txi_getter()
 
   metro[1].event = on_clock
-  metro[1].time = 60/global.bpm
+  metro[1].time = 60/bpm
   metro[1]:start()
 
-  voices = {'one', 'two', 'three', 'four', 'bass'}
+  clock_reset = Seq:new{division = 256,
+    action = function()
+      clock_divider:reset()
+      act('reset', voices)
+    end
+  }
 
-  clock_reset = Seq:new{division = 256, action = function() clock_divider:reset() reset(voices) end}
-  clock_divider = Seq:new{action = function() output[1](pulse(0.01)) on_division() end}
+  clock_divider = Seq:new{
+    action = function()
+      output[1](pulse(0.01))
+      on_division()
+    end
+  }
+
+  voices = {'one', 'two', 'three', 'four', 'bass'}
+  clk_voices = {voices[1], voices[2], voices[3], voices[4]}
+  trg_voices = {voices[5]}
 
   one = Voice:new{
     action = function(self, val)
-      self.mod.degree = (global.cv_degree - 1) + val
+      self.mod.degree = (CV_degree - 1) + val
       self.seq[1].mod.division = self:play_seq(2)
     end
   }
@@ -194,7 +197,7 @@ function init()
 
   two = Voice:new{octave = 1, degree = 3, level = 0.5,
     action = function(self, val)
-      self.mod.degree = (global.cv_degree - 1) + val
+      self.mod.degree = (CV_degree - 1) + val
       self.seq[1].mod.division = self:play_seq(2)
     end
   }
@@ -203,7 +206,7 @@ function init()
 
   three = Voice:new{octave = 1,
     action = function(self, val)
-      self.mod.degree = (global.cv_degree - 1) + val
+      self.mod.degree = (CV_degree - 1) + val
       self.seq[1].mod.division = self:play_seq(2)
     end
   }
@@ -215,7 +218,7 @@ function init()
       ii.wsyn.play_note(note, level)
     end,
     action = function(self, val)
-      self.mod.degree = (global.cv_degree - 1) + val
+      self.mod.degree = (CV_degree - 1) + val
       self.seq[1].mod.division = self:play_seq(2)
     end
   }
@@ -223,9 +226,12 @@ function init()
   four:new_seq{id = 2, sequence = {1,1,4}, division = 1}
 
   bass = Voice:new{octave = -4, level = 2,
+    synth = function(note, level)
+      ii.jf.play_voice(1, note, level)
+    end,
     action = function(self)
-      self.mod.degree = global.cv_degree
-      self.mod.octave = global.cv_octave
+      self.mod.degree = CV_degree
+      self.mod.octave = CV_octave
     end
   }
 end
@@ -244,26 +250,26 @@ ii.txi.event = function(e, val)
 end
 
 input[1].scale = function(s)
-  global.cv_octave = s.octave
-  global.cv_degree = s.index
+  CV_octave = s.octave
+  CV_degree = s.index
 end
 
 input[2].change = function()
-  play_voice{'bass'}
+  act('play_voice', trg_voices)
 end
 
 function on_clock()
   txi_getter()
 
-  global.bpm = linlin(txi.input[1], 0, 5, 10, 3000)
+  bpm = linlin(txi.input[1], 0, 5, 10, 3000)
   clock_divider.division = selector(txi.input[2], div.x2, 0, 4)
   set(voices, 'neg_harm', selector(txi.input[3], {false,true}, 0, 4) )
 
-  metro[1].time = 60/global.bpm
+  metro[1].time = 60/bpm
   clock_reset:play_seq()
   clock_divider:play_seq()
 end
 
 function on_division()
-  play_seq{'one', 'two', 'three', 'four'}
+  act('play_seq', clk_voices)
 end
