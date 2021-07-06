@@ -160,32 +160,67 @@ function act(method, names)
   end
 end
 
+function txi_getter()
+  if txi then
+    for i = 1, 4 do
+      ii.txi.get('param', i)
+      ii.txi.get('in', i)
+    end
+  end
+end
+
+ii.txi.event = function(e, val)
+  txi[ e.name == 'in' and 'input' or e.name ][ e.arg ] = val
+end
+
 function init()
-  input[1].mode('scale', CV_scale)
-  input[2].mode('change', 4, 0.1, 'rising')
-
-  ii.jf.mode(1)
-  ii.wsyn.ar_mode(1)
-
   txi_getter()
 
-  metro[1].event = on_clock
-  metro[1].time = 60/bpm
-  metro[1]:start()
+  input[1]{
+    mode = 'scale', notes = CV_scale,
+    scale = function(s)
+      CV_octave = s.octave
+      CV_degree = s.index
+    end
+  }
 
-  clock_reset = Seq:new{division = 256,
+  input[2]{
+    mode = 'change', threshold = 4, direction = 'rising',
+    change = function()
+      act('play_voice', trg_voices)
+    end
+  }
+
+  clk = metro.init{time = 60/bpm,
+    event = function()
+      txi_getter()
+
+      bpm = linlin(txi.input[1], 0, 5, 10, 3000)
+      clk_divider.division = selector(txi.input[2], div.x2, 0, 4)
+      set( voices, 'neg_harm', selector(txi.input[3], {false,true}, 0, 4) )
+
+      clk.time = 60/bpm
+      clk_reset:play_seq()
+      clk_divider:play_seq()
+    end
+  }
+
+  clk_reset = Seq:new{division = 256,
     action = function()
-      clock_divider:reset()
+      clk_divider:reset()
       act('reset', voices)
     end
   }
 
-  clock_divider = Seq:new{
+  clk_divider = Seq:new{
     action = function()
       output[1](pulse(0.01))
-      on_division()
+      act('play_seq', clk_voices)
     end
   }
+
+  ii.jf.mode(1)
+  ii.wsyn.ar_mode(1)
 
   voices = {'one', 'two', 'three', 'four', 'bass'}
   clk_voices = {voices[1], voices[2], voices[3], voices[4]}
@@ -239,42 +274,6 @@ function init()
       self.mod.octave = CV_octave
     end
   }
-end
 
-function txi_getter()
-  if txi then
-    for i = 1, 4 do
-      ii.txi.get('param', i)
-      ii.txi.get('in', i)
-    end
-  end
-end
-
-ii.txi.event = function(e, val)
-  txi[ e.name == 'in' and 'input' or e.name ][ e.arg ] = val
-end
-
-input[1].scale = function(s)
-  CV_octave = s.octave
-  CV_degree = s.index
-end
-
-input[2].change = function()
-  act('play_voice', trg_voices)
-end
-
-function on_clock()
-  txi_getter()
-
-  bpm = linlin(txi.input[1], 0, 5, 10, 3000)
-  clock_divider.division = selector(txi.input[2], div.x2, 0, 4)
-  set( voices, 'neg_harm', selector(txi.input[3], {false,true}, 0, 4) )
-
-  metro[1].time = 60/bpm
-  clock_reset:play_seq()
-  clock_divider:play_seq()
-end
-
-function on_division()
-  act('play_seq', clk_voices)
+  clk:start()
 end
