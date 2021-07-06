@@ -165,19 +165,6 @@ function play_seq(names) do_method(names, 'play_seq') end
 function play_voice(names) do_method(names, 'play_voice') end
 function reset(names) do_method(names, 'reset') end
 
-function txi_getter()
-  if txi then
-    for i = 1, 4 do
-      ii.txi.get('param', i)
-      ii.txi.get('in', i)
-    end
-  end
-end
-
-ii.txi.event = function(e, val)
-  txi[ e.name == 'in' and 'input' or e.name ][ e.arg ] = val
-end
-
 function init()
   input[1].mode('scale', global.cv_scale)
   input[2].mode('change', 4, 0.1, 'rising')
@@ -191,10 +178,10 @@ function init()
   metro[1].time = 60/global.bpm
   metro[1]:start()
 
+  voices = {'one', 'two', 'three', 'four', 'bass'}
+
   clock_reset = Seq:new{division = 256, action = function() clock_divider:reset() reset(voices) end}
   clock_divider = Seq:new{action = function() output[1](pulse(0.01)) on_division() end}
-
-  voices = {'one', 'two', 'three', 'four'}
 
   one = Voice:new{
     action = function(self, val)
@@ -243,6 +230,19 @@ function init()
   }
 end
 
+function txi_getter()
+  if txi then
+    for i = 1, 4 do
+      ii.txi.get('param', i)
+      ii.txi.get('in', i)
+    end
+  end
+end
+
+ii.txi.event = function(e, val)
+  txi[ e.name == 'in' and 'input' or e.name ][ e.arg ] = val
+end
+
 input[1].scale = function(s)
   global.cv_octave = s.octave
   global.cv_degree = s.index
@@ -265,5 +265,5 @@ function on_clock()
 end
 
 function on_division()
-  play_seq(voices)
+  play_seq{'one', 'two', 'three', 'four'}
 end
