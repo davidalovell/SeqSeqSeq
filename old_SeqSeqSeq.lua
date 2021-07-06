@@ -26,11 +26,11 @@ global = {
   , degree = 1
   , transpose = 0
 
-  , scale = mixolydian
-  , neg_harm = false
+  , scale = mixolydian -- nil
+  , neg_harm = false -- nil
 }
 
-txi = {param = {}, input = {}}
+txi = {param = {}, input = {}} -- requires TXi
 
 Voice = {}
 function Voice:new(on, ext_octave, ext_degree, level, octave, degree, transpose, synth)
@@ -45,7 +45,7 @@ function Voice:new(on, ext_octave, ext_degree, level, octave, degree, transpose,
   o.octave = octave or 0
   o.degree = degree or 1
   o.transpose = transpose or 0
-  o.synth = synth or function(note, level) ii.jf.play_note(note, level) end
+  o.synth = synth or function(note, level) ii.jf.play_note(note, level) end -- requires JF
 
   o.scale = global.scale == nil and CV_SCALE or global.scale
   o.neg_harm = global.neg_harm or false
@@ -202,40 +202,8 @@ function init()
   trigger_reset = divider(function() global.reset = true end)
   clock_divider = divider(function() output[1](pulse(0.01)) on_division() end)
 
-  ii.jf.run_mode(1)
-  ii.jf.run(5)
+  -- declare voices/sequencers/actions
 
-  output[2](lfo(8,5,'sine'))
-
-  new_chord = Seq:new(true, {1,5,4,1}, 24, 1, 'next')
-
-  arp = Voice:new(true, false, false, 0.75, 0, 1, 0)
-  arp:new_seq(1, true, {1,3,5}, 3, 1, 'next', true)
-  arp:new_seq(2, true, {1,2,3}, 4, 1, 'prev')
-  arp:new_seq(3, true, {4,1,1,3,1}, 1, 1, 'next')
-  function arp:action(val)
-    self.seq[1].sequence[4] = self.seq[1].sequence[self:play_seq(2)] + math.random(0,1) * 7
-    self.seq[1].mod.division = self:play_seq(3)
-    self.mod.degree = val + chord
-  end
-
-  arp2 = Voice:new(true, false, false, 0.5, 0, 5, 0)
-  arp2:new_seq(1, true, {1,3,5}, 2, 2, 'next', true)
-  arp2:new_seq(2, true, {6,4,1,1}, 1, 1, 'next')
-  function arp2:action(val)
-    self.seq[1].mod.division = self:play_seq(2)
-    self.mod.degree = val + chord + math.random(-1,0) * 7
-  end
-
-  bass = Voice:new(true, false, false, 1, -2, 1, 0, function(note, level) ii.jf.play_voice(1, note, level) end)
-  bass:new_seq(1, true, {1,3,5}, 6, 1, 'next', true)
-  bass:new_seq(2, true, {4,3,1}, 1, 1, 'next')
-  function bass:action(val)
-    self.seq[1].sequence[3] = 5 + math.random(-1,1)
-    self.seq[2].sequence = selector(txi.param[4], {{4,3,1}, {1,1,2}, {1}}, 0, 10)
-    self.seq[1].mod.division = self:play_seq(2)
-    self.mod.degree = val + chord
-  end
   --
 end
 
@@ -261,17 +229,18 @@ end
 input[2].change = function()
   trigger_reset(global.reset_count)
 
+  -- voices/seqeuncers to play on trigger to crow input[2]
+
+  --
   global.reset = false
 end
 
 function on_clock()
   txi_getter()
 
-  global.bpm = linlin(txi.input[1], 0, 5, 10, 3000)
-  global.division = selector(txi.input[2], div.x2, 0, 4)
-  global.neg_harm = selector(txi.input[3], {false,true}, 0, 4)
-  global.reset_count = global.division * new_chord.division * #new_chord.sequence * 4
+  -- variables to be set on clock, e.g.
 
+  --
   metro[1].time = 60/global.bpm
   clock_reset(global.reset_count)
   clock_divider(global.division)
@@ -279,8 +248,7 @@ function on_clock()
 end
 
 function on_division()
-  chord = new_chord:play_seq() - 1
-  arp:play_seq()
-  arp2:play_seq()
-  bass:play_seq()
+  -- voices/sequencers to play on every clock division
+
+  --
 end
