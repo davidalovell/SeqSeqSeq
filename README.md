@@ -1,15 +1,11 @@
 # SeqSeqSeq
-A Crow script that allows you to create multiple voice and sequencer objects
-
+A Crow script that allows you to create multiple voice and sequencer objects.  
 This was designed to be part of this small system:
 
 
-Crow is acting as the main clock, a quantiser and sequencer
-
-TXi allows for hands on control of the script in a customisable way
-
-Just Friends and w/ are the sound sources
-
+Crow is acting as the main clock, a quantiser and sequencer  
+TXi allows for hands on control of the script in a customisable way  
+Just Friends and w/ are the sound sources  
 Doboz XIIO is a touch controller, sending CV and triggers to Crow
 
 ## Requirements:
