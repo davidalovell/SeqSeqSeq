@@ -130,8 +130,13 @@ function Seq:reset()
   self.step_count = 0
 end
 
-function round(input) return input % 1 >= 0.5 and math.ceil(input) or math.floor(input) end
-function clamper(input, min, max) return math.min( math.max( min, input ), max ) end
+function round(input)
+  return input % 1 >= 0.5 and math.ceil(input) or math.floor(input)
+end
+
+function clamper(input, min, max)
+  return math.min( math.max( min, input ), max )
+end
 
 function linlin(input, range_min, range_max, output_min, output_max)
   return (input - range_min) * (output_max - output_min) / (range_max - range_min) + output_min
@@ -263,7 +268,7 @@ function on_clock()
 
   bpm = linlin(txi.input[1], 0, 5, 10, 3000)
   clock_divider.division = selector(txi.input[2], div.x2, 0, 4)
-  set(voices, 'neg_harm', selector(txi.input[3], {false,true}, 0, 4) )
+  set( voices, 'neg_harm', selector(txi.input[3], {false,true}, 0, 4) )
 
   metro[1].time = 60/bpm
   clock_reset:play_seq()
