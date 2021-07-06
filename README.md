@@ -31,7 +31,7 @@ Voice:new{
   octave = 0, -- defaults to 0
   degree = 1, -- defaults to 1 (1 based)
   transpose = 0, -- defaults to 0 (0 based)
-  synth = function(note, level)
+  synth = function(note, level) -- defaults to this function
     ii.jf.play_note(note, level)
   end,
   action = function(self, val) -- defaults to this empty function
