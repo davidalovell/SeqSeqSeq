@@ -1,7 +1,13 @@
 # SeqSeqSeq
-A customisable script for crow that can act as a CV quantiser and create mutliple sequencers influenced by this. Notes are sent to Just Friends by default but this too is customisable. Parameters can be controlled by live coding in druid, but a TXi (or other ii input device) really helps.
+A Crow script that allows you to create multiple voice and sequencer objects
 
-Based on ...
+This was designed to be part of this small system:
+
+
+Crow is acting as the main clock, a quantiser and sequencer
+TXi allows for hands on control of the script in a customisable way
+Just Friends and w/ are the sound sources
+Doboz XIIO is a touch controller, sending CV and triggers to Crow
 
 ## Requirements:
 - crow
@@ -9,31 +15,28 @@ Based on ...
 
 ## Recommended:
 - Just Friends
+- w/
 - TXi
-
 (script requires some small changes without these)
 
 ## Optional:
 - Any other ii capable device
 
-## Limitations
-- Script length - you can only add around 40 lines of user code before the script becomes too long
-- However, additional voices/sequencers can be created in druid after the script is run
-
 ## Getting started:
 ### 1. Create voices
 ```lua
-Voice:new(on, ext_octave, ext_degree, level, octave, degree, transpose, synth)
--- arguments:
-  -- on:          is the voice enabled?, (true/false), defaults to true
-  -- ext_octave:  octave transposition based on external CV to input[1], (true/false), defaults to false
-  -- ext_degree:  diatonic transposition based on external CV to input[1], (true/false), defaults to false
-  -- level:       volume level, defaults to 1
-  -- octave:      octave, defaults to 0
-  -- degree:      scale degree, 1 based (i.e. 1 is 1st degree, 2 is 2nd etc.), defaults to 1
-  -- transpose:   transposition in semitones, 0 based (i.e. 0 is no transposition, 7 is transposition by 7 semitones etc.), defaults 0
-  -- synth:       function to play synth, defaults to:
-                  function(note, level) ii.jf.play_note(note, level) end  
+Voice:new{
+  on = true, -- defaults to 'true'
+  level = 1, -- defaults to 1
+  octave = 0, -- defaults to 0
+  degree = 1, -- defaults to 1 (1 based)
+  transpose = 0, -- defaults to 0 (0 based)
+  synth = function(note, level)
+    ii.jf.play_note(note, level)
+  end,
+  action = function(self, val) -- defaults to this empty function
+  end
+}
 ```
 Examples:
 ```lua
@@ -47,7 +50,7 @@ cv_keyboard_voice_contstraned_to_one_octave = Voice:new(true, false, true, 1, 0,
 ```lua
 Voice:new_seq(id, on, sequence, division, step, behaviour, action)
 -- arguments:
-  -- id:          each sequencer should be given an id, typically 
+  -- id:          each sequencer should be given an id, typically
   -- on:          is the sequencer enabled?, (true/false), defaults to true
   -- sequence:    defaults to {1,2,3,4}
   -- division:    clock divider for sequencer, defaults to 1
@@ -74,10 +77,10 @@ function my_voice:action(val)
   self.mod.division = self:play_seq(3)
 end
 ```
-If a sequencer that has been created has action = true (see above) then this function will be played when the sequencer is called. As you can see you can make it do whatever you want. 
+If a sequencer that has been created has action = true (see above) then this function will be played when the sequencer is called. As you can see you can make it do whatever you want.
 
 ### 4. Standalone sequencers
-Create standalone sequencers 
+Create standalone sequencers
 ```lua
 Seq:new(on, sequence, division, step, behaviour, action)
 -- arguments:
@@ -88,7 +91,7 @@ Other details:
 -- other available properties:
   -- scale:         chosen scale, (list of scales at start of script), defaults to the scale set by CV_SCALE at top of script                  
   -- neg_harm:      transforms note to negative harmony equivalent, (true/false), defaults to false
-  
+
 -- modulation properties:
   -- create sequencers to modulate these properties without affecting the main properties above
   -- mod.on:        all 'on' properties need to be true for the Voice to play
@@ -98,7 +101,7 @@ Other details:
   -- mod.transpose: adds to other 'transpose' properties
 ```
 
-This creates a new Voice called `myvoice`. 
+This creates a new Voice called `myvoice`.
 
 ```lua
 myvoices:
@@ -123,5 +126,3 @@ myvoices:
 - on_clock (variables to be set on on clock)
 - input[2].change (voices/sequencers to play on trigger)
 - on_division (voices/sequencers to play on clock division)
-
-
