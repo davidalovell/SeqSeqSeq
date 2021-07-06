@@ -1,16 +1,17 @@
 # SeqSeqSeq
-A Crow script that allows you to create multiple voice and sequencer objects.  
+A crow script that allows you to create multiple voice and sequencer objects.  
 This was designed to be part of this small system:
 
+![image](image.jpg)
 
-- Crow is acting as the main clock, a quantiser and sequencer
+- crow is acting as the main clock, a quantiser and sequencer
 - TXi allows for hands on control of the script in a customisable way
 - Just Friends and w/ are the sound sources
-- Doboz XIIO is a touch controller, sending CV and triggers to Crow
+- Doboz XIIO is a touch controller, sending CV and triggers to crow
 
 ## Requirements:
 - crow
-- written for crow firmware 2.20
+- crow firmware 2.2
 
 ## Recommended:
 - Just Friends
@@ -21,29 +22,59 @@ This was designed to be part of this small system:
 ## Optional:
 - Any other ii capable device
 
+## Limitations:
+- Script length
+- Not tested with scales > 7 notes
+
 ## Getting started:
 ### 1. Create voices
 ```lua
 Voice:new{
-  on = true, -- defaults to 'true'
-  level = 1, -- defaults to 1
-  octave = 0, -- defaults to 0
-  degree = 1, -- defaults to 1 (1 based)
-  transpose = 0, -- defaults to 0 (0 based)
-  synth = function(note, level) -- defaults to this function
+  on = true,                      -- defaults to true
+  level = 1,                      -- defaults to 1
+  octave = 0,                     -- defaults to 0
+  degree = 1,                     -- defaults to 1 (1-based)
+  transpose = 0,                  -- defaults to 0 (0-based)
+  scale = lydian                  -- defaults to the value of CV_scale (CV_scale also determines the notes in input[1].notes)
+                                  -- (set CV_scale to the scale setting of your external CV source)
+  neg_harm = false                -- defaults to false
+                                  -- (plays the negative harmony equivalent of the note based on the selected scale)
+  
+  synth = function(note, level)   -- defaults to this function which plays a note on Just Friends
     ii.jf.play_note(note, level)
   end,
-  action = function(self, val) -- defaults to this empty function
+  
+  action = function(self, val)    -- defaults to this empty function, the idea is to add custom commands to this
   end
 }
 ```
 Examples:
 ```lua
-my_voice = Voice:new()
-jf_voice_transposed_by_a_fifth = Voice:new(true, false, false, 1, 0, 5, 0)
-wsyn_voice_two_octaves_up = Voice:new(true, false, false, 1, 2, 1, 0, function(note, level) ii.wsyn.play_note(note, level) end)
-cv_keyboard_voice = Voice:new(true, true, true, 1, 0, 1, 0)
-cv_keyboard_voice_contstraned_to_one_octave = Voice:new(true, false, true, 1, 0, 1, 0)
+my_voice = Voice:new()            -- creates a voice with default settings
+
+my_voice = Voice:new{             -- creates a voice transposed up and octave and a diatonic fifth
+  octave = 1,                     -- (note {} syntax)
+  degree = 5
+}
+
+my_voice = Voice:new{               -- play w/syn instead of the default
+  synth = function(note, level)
+    ii.wsyn.play_note(note, level)
+  end
+}
+
+my_voice = Voice:new{               -- play Just Friends first voice
+  synth = function(note, level)
+    ii.jf.play_voice(1, note, level)
+  end
+}
+
+my_voice = Voice:new{               -- creates a voice you can play with your external CV source into input[1]
+  action = function(self, val)
+    self.mod.degree = val + (CV_degree - 1) -- (subtract 1 from CV_degree as this is 1-based)
+    self.mod.octave = val + CV_octave
+  end
+}
 ```
 ### 2. Create sequencers within the voices
 ```lua
