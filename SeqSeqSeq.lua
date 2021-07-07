@@ -176,16 +176,14 @@ end
 function init()
   txi_getter()
 
-  input[1]{
-    mode = 'scale', notes = CV_scale,
+  input[1]{mode = 'scale', notes = CV_scale,
     scale = function(s)
       CV_octave = s.octave
       CV_degree = s.index
     end
   }
 
-  input[2]{
-    mode = 'change', threshold = 4, direction = 'rising',
+  input[2]{mode = 'change', threshold = 4, direction = 'rising',
     change = function()
       act('play_voice', trg_voices)
     end
