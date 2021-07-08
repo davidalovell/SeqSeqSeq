@@ -48,7 +48,6 @@ function Voice:new(args)
   o.mod = {on = true, level = 1, octave = 0, degree = 1, transpose = 0}
 
   o.seq = {}
-  o.seq_id = 0
 
   return o
 end
@@ -74,8 +73,8 @@ function Voice:new_seq(args)
   local t = args or {}
 
   if t.id == nil then
-    self.seq_id = self.seq_id + 1
-    t.id = self.seq_id
+    print(self.id .. ': no seq id')
+    return
   end
 
   t.action = type(t.action) == 'function' and t.action or t.action and function(val) self:play_voice(val) end
@@ -248,8 +247,8 @@ function init()
       self.mod.on = self:play_seq(2)
     end
   }
-  one:new_seq{sequence = {1,2}, division = 1, action = true}
-  one:new_seq{sequence = {true, false}, division = 4}
+  one:new_seq{id = 1, sequence = {1,2}, division = 1, action = true}
+  one:new_seq{id = 2, sequence = {true, false}, division = 4}
 
   two = Voice:new{id = 'two', degree = 5, octave = -1,
     action = function(self, val)
@@ -259,8 +258,8 @@ function init()
       self.mod.on = self:play_seq(2)
     end
   }
-  two:new_seq{sequence = {2,1}, division = 3, action = true}
-  two:new_seq{sequence = {true, false}, division = 4}
+  two:new_seq{id = 1, sequence = {2,1}, division = 3, action = true}
+  two:new_seq{id = 2, sequence = {true, false}, division = 4}
 
   clk:start()
 end
