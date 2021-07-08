@@ -13,12 +13,12 @@ div = {
   even = {1,2,4,6,8,10}
 }
 
-CV_scale = lydian
-CV_degree = 1
-CV_octave = 0
-
 bpm = 60
+cv_scale = lydian
+cv_degree = 1
+cv_octave = 0
 
+voices = {}
 txi = {param = {}, input = {}}
 
 Voice = {}
@@ -26,12 +26,16 @@ function Voice:new(args)
   local o = setmetatable( {}, {__index = Voice} )
   local t = args or {}
 
+  if t.id == nil then return end
+  o.id = t.id
+  voices[o.id] = o.id
+
   o.on = t.on == nil and true or t.on
   o.level = t.level == nil and 1 or t.level
   o.octave = t.octave == nil and 0 or t.octave
   o.degree = t.degree == nil and 1 or t.degree
   o.transpose = t.transpose == nil and 0 or t.transpose
-  o.scale = t.scale == nil and CV_scale or t.scale
+  o.scale = t.scale == nil and cv_scale or t.scale
   o.neg_harm = t.neg_harm == nil and false or t.neg_harm
   o.synth = t.synth == nil and function(note, level) ii.jf.play_note(note, level) end or t.synth
   o.action = t.action == nil and function(self, val) end or t.action
@@ -87,7 +91,6 @@ function Seq:new(args)
   local o = setmetatable( {}, {__index = Seq} )
   local t = args or {}
 
-  o.on = t.on == nil and true or t.on
   o.division = t.division == nil and 1 or t.division
   o.step = t.step == nil and 1 or t.step
   o.sequence = t.sequence == nil and {1} or t.sequence
@@ -102,12 +105,11 @@ function Seq:new(args)
   return o
 end
 
-function Seq:_on() return self.on and self.mod.on end
 function Seq:_division() return self.division * self.mod.division end
 function Seq:_step() return self.step * self.mod.step end
 
-function Seq:_div_adv() return self:_on() and self.div_count % self:_division() + 1 end
-function Seq:_step_adv() return self:_on() and self.div_count == 1 and self:_behaviour() end
+function Seq:_div_adv() return self.div_count % self:_division() + 1 end
+function Seq:_step_adv() return self.div_count == 1 and self:_behaviour() end
 
 function Seq:_behaviour()
   return self.behaviour == 'next' and ( (self.step_count + self.step) - 1 ) % #self.sequence + 1
@@ -176,30 +178,18 @@ end
 function init()
   txi_getter()
 
-  input[1]{mode = 'scale', notes = CV_scale,
+  input[1]{mode = 'scale', notes = cv_scale,
     scale = function(s)
-      CV_octave = s.octave
-      CV_degree = s.index
+      cv_octave = s.octave
+      cv_degree = s.index
     end
   }
 
   input[2]{mode = 'change', threshold = 4, direction = 'rising',
     change = function()
-      act('play_voice', trg_voices)
-    end
-  }
+      -- user defined:
+      act('play_seq', voices)
 
-  clk = metro.init{time = 60/bpm,
-    event = function()
-      txi_getter()
-
-      bpm = linlin(txi.input[1], 0, 5, 10, 3000)
-      clk_divider.division = selector(txi.input[2], div.x2, 0, 4)
-      set( voices, 'neg_harm', selector(txi.input[3], {false,true}, 0, 4) )
-
-      clk.time = 60/bpm
-      clk_reset:play_seq()
-      clk_divider:play_seq()
     end
   }
 
@@ -213,65 +203,52 @@ function init()
   clk_divider = Seq:new{
     action = function()
       output[1](pulse(0.01))
-      act('play_seq', clk_voices)
+      -- user defined:
+
+    end
+  }
+
+
+  clk = metro.init{time = 60/bpm,
+    event = function()
+      txi_getter()
+      -- user defined:
+      bpm = linlin(txi.input[1], 0, 5, 10, 3000)
+      clk_divider.division = selector(txi.input[2], div.x2, 0, 4)
+      set(voices, 'neg_harm', selector(txi.input[3], {false,true}, 0, 4))
+
+      --
+      clk.time = 60/bpm
+      clk_reset:play_seq()
+      clk_divider:play_seq()
     end
   }
 
   ii.jf.mode(1)
   ii.wsyn.ar_mode(1)
 
-  voices = {'one', 'two', 'three', 'four', 'bass'}
-  clk_voices = {voices[1], voices[2], voices[3], voices[4]}
-  trg_voices = {voices[5]}
-
-  one = Voice:new{
+  -- declare voices/sequencers:
+  one = Voice:new{id = 'one',
     action = function(self, val)
-      self.mod.degree = (CV_degree - 1) + val
-      self.seq[1].mod.division = self:play_seq(2)
+      self.mod.degree = cv_degree
+      self.mod.octave = cv_octave
+      self.seq[1].mod.division = val
+      self.mod.on = self:play_seq(2)
     end
   }
-  one:new_seq{id = 1, sequence = {1,3,5,7}, action = true, division = 2}
-  one:new_seq{id = 2, sequence = {1,2,1,2}, division = 1}
+  one:new_seq{id = 1, sequence = {1,2}, division = 1, action = true}
+  one:new_seq{id = 2, sequence = {true, false}, division = 4}
 
-  two = Voice:new{octave = 1, degree = 3, level = 0.5,
+  two = Voice:new{id = 'two', degree = 5, octave = -1,
     action = function(self, val)
-      self.mod.degree = (CV_degree - 1) + val
-      self.seq[1].mod.division = self:play_seq(2)
+      self.mod.degree = cv_degree
+      self.mod.octave = cv_octave
+      self.seq[1].mod.division = val
+      self.mod.on = self:play_seq(2)
     end
   }
-  two:new_seq{id = 1, sequence = {1,2,5,7,0}, action = true, division = 3}
-  two:new_seq{id = 2, sequence = {1,1,4}, division = 1}
-
-  three = Voice:new{octave = 1,
-    action = function(self, val)
-      self.mod.degree = (CV_degree - 1) + val
-      self.seq[1].mod.division = self:play_seq(2)
-    end
-  }
-  three:new_seq{id = 1, sequence = {1,2,3,4,5}, action = true, division = 3, behaviour = 'drunk'}
-  three:new_seq{id = 2, sequence = {1,2,3,4}, division = 1, behaviour = 'random'}
-
-  four = Voice:new{octave = 1, degree = 5, level = 0.5,
-    synth = function(note, level)
-      ii.wsyn.play_note(note, level)
-    end,
-    action = function(self, val)
-      self.mod.degree = (CV_degree - 1) + val
-      self.seq[1].mod.division = self:play_seq(2)
-    end
-  }
-  four:new_seq{id = 1, sequence = {1,2,5,7,0}, action = true, division = 2, behaviour = 'prev'}
-  four:new_seq{id = 2, sequence = {1,1,4}, division = 1}
-
-  bass = Voice:new{octave = -4, level = 2,
-    synth = function(note, level)
-      ii.jf.play_voice(1, note, level)
-    end,
-    action = function(self)
-      self.mod.degree = CV_degree
-      self.mod.octave = CV_octave
-    end
-  }
+  two:new_seq{id = 1, sequence = {2,1}, division = 3, action = true}
+  two:new_seq{id = 2, sequence = {true, false}, division = 4}
 
   clk:start()
 end
