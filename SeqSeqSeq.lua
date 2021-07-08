@@ -260,6 +260,7 @@ function init()
   }
   two:new_seq{id = 1, sequence = {2,1}, division = 3, action = true}
   two:new_seq{id = 2, sequence = {true, false}, division = 4}
-
+  
+  --
   clk:start()
 end
