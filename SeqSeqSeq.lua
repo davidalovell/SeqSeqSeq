@@ -230,8 +230,7 @@ function init()
 
       --
       clk.time = 60/bpm
-      clk_reset:play_seq()
-      clk_divider:play_seq()
+      act('play_seq', {'clk_reset', 'clk_divider'})
     end
   }
 
@@ -260,7 +259,7 @@ function init()
   }
   two:new_seq{id = 1, sequence = {2,1}, division = 3, action = true}
   two:new_seq{id = 2, sequence = {true, false}, division = 4}
-  
+
   --
   clk:start()
 end
