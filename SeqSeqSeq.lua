@@ -248,8 +248,8 @@ function init()
       self.mod.on = self:play_seq(2)
     end
   }
-  one:new_seq{id = 1, sequence = {1,2}, division = 1, action = true}
-  one:new_seq{id = 2, sequence = {true, false}, division = 4}
+  one:new_seq{sequence = {1,2}, division = 1, action = true}
+  one:new_seq{sequence = {true, false}, division = 4}
 
   two = Voice:new{id = 'two', degree = 5, octave = -1,
     action = function(self, val)
@@ -259,8 +259,8 @@ function init()
       self.mod.on = self:play_seq(2)
     end
   }
-  two:new_seq{id = 1, sequence = {2,1}, division = 3, action = true}
-  two:new_seq{id = 2, sequence = {true, false}, division = 4}
+  two:new_seq{sequence = {2,1}, division = 3, action = true}
+  two:new_seq{sequence = {true, false}, division = 4}
 
   clk:start()
 end
