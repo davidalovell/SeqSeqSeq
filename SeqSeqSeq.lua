@@ -19,6 +19,7 @@ cv_degree = 1
 cv_octave = 0
 
 voices = {}
+
 txi = {param = {}, input = {}}
 
 Voice = {}
@@ -26,7 +27,11 @@ function Voice:new(args)
   local o = setmetatable( {}, {__index = Voice} )
   local t = args or {}
 
-  if t.id == nil then return end
+  if t.id == nil then
+    print('no voice id')
+    return
+  end
+
   o.id = t.id
   voices[o.id] = o.id
 
@@ -43,6 +48,7 @@ function Voice:new(args)
   o.mod = {on = true, level = 1, octave = 0, degree = 1, transpose = 0}
 
   o.seq = {}
+  o.seq_id = 0
 
   return o
 end
@@ -66,8 +72,14 @@ end
 
 function Voice:new_seq(args)
   local t = args or {}
+
+  if t.id == nil then
+    self.seq_id = self.seq_id + 1
+    t.id = self.seq_id
+  end
+
   t.action = type(t.action) == 'function' and t.action or t.action and function(val) self:play_voice(val) end
-  self.seq[ t.id == nil and #self.seq + 1 or t.id ] = Seq:new(t)
+  self.seq[t.id] = Seq:new(t)
 end
 
 function Voice:play_seq(id)
