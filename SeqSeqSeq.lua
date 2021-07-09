@@ -45,7 +45,6 @@ function Voice:new(args)
   o.mod = {on = true, level = 1, octave = 0, degree = 1, transpose = 0}
 
   o.seq = {}
-  o.seq_id = 0
 
   return o
 end
@@ -93,6 +92,8 @@ Seq = {}
 function Seq:new(args)
   local o = setmetatable( {}, {__index = Seq} )
   local t = args or {}
+
+  -- some id system to help reset
 
   o.division = t.division == nil and 1 or t.division
   o.step = t.step == nil and 1 or t.step
