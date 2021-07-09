@@ -27,13 +27,10 @@ function Voice:new(args)
   local o = setmetatable( {}, {__index = Voice} )
   local t = args or {}
 
-  if t.id == nil then
-    print('no voice id')
-    return
+  if t.id ~= nil then
+    o.id = t.id
+    voices[o.id] = o.id
   end
-
-  o.id = t.id
-  voices[o.id] = o.id
 
   o.on = t.on == nil and true or t.on
   o.level = t.level == nil and 1 or t.level
@@ -48,6 +45,7 @@ function Voice:new(args)
   o.mod = {on = true, level = 1, octave = 0, degree = 1, transpose = 0}
 
   o.seq = {}
+  o.seq_id = 0
 
   return o
 end
@@ -71,14 +69,8 @@ end
 
 function Voice:new_seq(args)
   local t = args or {}
-
-  if t.id == nil then
-    print(self.id .. ': no seq id')
-    return
-  end
-
   t.action = type(t.action) == 'function' and t.action or t.action and function(val) self:play_voice(val) end
-  self.seq[t.id] = Seq:new(t)
+  self.seq[t.id == nil and #self.seq + 1 or t.id] = Seq:new(t)
 end
 
 function Voice:play_seq(id)
@@ -246,8 +238,8 @@ function init()
       self.mod.on = self:play_seq(2)
     end
   }
-  one:new_seq{id = 1, sequence = {1,2}, division = 1, action = true}
-  one:new_seq{id = 2, sequence = {true, false}, division = 4}
+  one:new_seq{sequence = {1,2}, division = 1, action = true}
+  one:new_seq{sequence = {true, false}, division = 4}
 
   two = Voice:new{id = 'two', degree = 5, octave = -1,
     action = function(self, val)
@@ -257,8 +249,8 @@ function init()
       self.mod.on = self:play_seq(2)
     end
   }
-  two:new_seq{id = 1, sequence = {2,1}, division = 3, action = true}
-  two:new_seq{id = 2, sequence = {true, false}, division = 4}
+  two:new_seq{sequence = {2,1}, division = 3, action = true}
+  two:new_seq{sequence = {true, false}, division = 4}
 
   --
   clk:start()
