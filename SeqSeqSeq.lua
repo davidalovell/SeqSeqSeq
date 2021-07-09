@@ -19,6 +19,7 @@ cv_degree = 1
 cv_octave = 0
 
 voices = {}
+seqs = {}
 
 txi = {param = {}, input = {}}
 
@@ -69,7 +70,7 @@ end
 function Voice:new_seq(args)
   local t = args or {}
   t.action = type(t.action) == 'function' and t.action or t.action and function(val) self:play_voice(val) end
-  self.seq[t.id == nil and #self.seq + 1 or t.id] = Seq:new(t)
+  self.seq[t.index == nil and #self.seq + 1 or t.index] = Seq:new(t)
 end
 
 function Voice:play_seq(id)
@@ -93,7 +94,10 @@ function Seq:new(args)
   local o = setmetatable( {}, {__index = Seq} )
   local t = args or {}
 
-  -- some id system to help reset
+  if t.id ~= nil then
+    o.id = t.id
+    seqs[o.id] = o.id
+  end
 
   o.division = t.division == nil and 1 or t.division
   o.step = t.step == nil and 1 or t.step
@@ -201,10 +205,11 @@ function init()
     action = function()
       clk_divider:reset()
       act('reset', voices)
+      act('reset', seqs)
     end
   }
 
-  clk_divider = Seq:new{
+  clk_divider = Seq:new{id = 'clk_divider',
     action = function()
       output[1](pulse(0.01))
       -- user defined:
@@ -223,11 +228,14 @@ function init()
 
       --
       clk.time = 60/bpm
-      act('play_seq', {'clk_reset', 'clk_divider'})
+      clk_reset:play_seq()
+      act('play_seq', seqs)
     end
   }
 
   ii.jf.mode(1)
+  ii.jf.run_mode(1)
+  ii.jf.run(5)
   ii.wsyn.ar_mode(1)
 
   -- declare voices/sequencers:
