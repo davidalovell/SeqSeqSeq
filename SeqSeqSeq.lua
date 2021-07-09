@@ -105,7 +105,7 @@ function Seq:new(args)
   o.behaviour = t.behaviour == nil and 'next' or t.behaviour
   o.action = t.action == nil and nil or t.action
 
-  o.mod = {on = true, division = 1, step = 1}
+  o.mod = {division = 1, step = 1}
 
   o.div_count = 0
   o.step_count = 0
