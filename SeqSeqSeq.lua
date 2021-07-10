@@ -70,16 +70,16 @@ end
 function Voice:new_seq(args)
   local t = args or {}
   t.action = type(t.action) == 'function' and t.action or t.action and function(val) self:play_voice(val) end
-  self.seq[t.index == nil and #self.seq + 1 or t.index] = Seq:new(t)
+  self.seq[t.ix == nil and #self.seq + 1 or t.ix] = Seq:new(t)
 end
 
-function Voice:play_seq(id)
-  if id == nil then
+function Voice:play_seq(ix)
+  if ix == nil then
     for k, v in pairs(self.seq) do
       local play = self.seq[k].action and self.seq[k]:play_seq()
     end
   else
-    return self.seq[id]:play_seq()
+    return self.seq[ix]:play_seq()
   end
 end
 
@@ -180,7 +180,7 @@ function txi_getter()
 end
 
 ii.txi.event = function(e, val)
-  txi[ e.name == 'in' and 'input' or e.name ][ e.arg ] = val
+  txi[e.name == 'in' and 'input' or e.name][e.arg] = val
 end
 
 function init()
@@ -216,7 +216,6 @@ function init()
 
     end
   }
-
 
   clk = metro.init{time = 60/bpm,
     event = function()
