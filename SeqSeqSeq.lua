@@ -21,12 +21,12 @@ cv_octave = 0
 txi = {param = {}, input = {}}
 
 Voice = {}
-voices = {}
 function Voice:new(args)
   local o = setmetatable( {}, {__index = Voice} )
   local t = args or {}
 
   if t.id ~= nil then
+    if type(voices) ~= 'table' then voices = {} end
     o.id = t.id
     voices[o.id] = o.id
   end
@@ -88,12 +88,12 @@ function Voice:reset()
 end
 
 Seq = {}
-seqs = {}
 function Seq:new(args)
   local o = setmetatable( {}, {__index = Seq} )
   local t = args or {}
 
   if t.id ~= nil then
+    if type(seqs) ~= 'table' then seqs = {} end
     o.id = t.id
     seqs[o.id] = o.id
   end
