@@ -18,9 +18,6 @@ cv_scale = lydian
 cv_degree = 1
 cv_octave = 0
 
-voices = {}
-seqs = {}
-
 txi = {param = {}, input = {}}
 
 Voice = {}
@@ -29,6 +26,7 @@ function Voice:new(args)
   local t = args or {}
 
   if t.id ~= nil then
+    if type(voices) ~= 'table' then voices = {} end
     o.id = t.id
     voices[o.id] = o.id
   end
@@ -95,6 +93,7 @@ function Seq:new(args)
   local t = args or {}
 
   if t.id ~= nil then
+    if type(seqs) ~= 'table' then seqs = {} end
     o.id = t.id
     seqs[o.id] = o.id
   end
