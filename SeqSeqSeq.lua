@@ -1,4 +1,4 @@
---- SeqSeqSeq
+--- SeqseqSeq
 
 lydian = {0,2,4,6,7,9,11}
 dorian = {0,2,3,5,7,9,10}
@@ -18,20 +18,17 @@ cv_scale = lydian
 cv_degree = 1
 cv_octave = 0
 
-voices = {}
-seqs = {}
-
 txi = {param = {}, input = {}}
 
 Voice = {}
-voices = {}
+Voices = {}
 function Voice:new(args)
   local o = setmetatable( {}, {__index = Voice} )
   local t = args or {}
 
   if t.id ~= nil then
     o.id = t.id
-    voices[o.id] = o.id
+    Voices[o.id] = o.id
   end
 
   o.on = t.on == nil and true or t.on
@@ -91,14 +88,14 @@ function Voice:reset()
 end
 
 Seq = {}
-seqs = {}
+Seqs = {}
 function Seq:new(args)
   local o = setmetatable( {}, {__index = Seq} )
   local t = args or {}
 
   if t.id ~= nil then
     o.id = t.id
-    seqs[o.id] = o.id
+    Seqs[o.id] = o.id
   end
 
   o.division = t.division == nil and 1 or t.division
@@ -166,7 +163,7 @@ function set(names, property, val)
   end
 end
 
-function act(method, names)
+function action(method, names)
   for k, v in pairs(names) do
     _G[v][method](_G[v])
   end
@@ -198,16 +195,15 @@ function init()
   input[2]{mode = 'change', threshold = 4, direction = 'rising',
     change = function()
       -- user defined:
-      act('play_seq', voices)
+      action('play_seq', Voices)
 
     end
   }
 
   clk_reset = Seq:new{division = 256,
     action = function()
-      clk_divider:reset()
-      act('reset', voices)
-      act('reset', seqs)
+      action('reset', Seqs)
+      action('reset', Voices)
     end
   }
 
@@ -225,21 +221,22 @@ function init()
       -- user defined:
       bpm = linlin(txi.input[1], 0, 5, 10, 3000)
       clk_divider.division = selector(txi.input[2], div.x2, 0, 4)
-      set(voices, 'neg_harm', selector(txi.input[3], {false,true}, 0, 4))
+      set(Voices, 'neg_harm', selector(txi.input[3], {false,true}, 0, 4))
 
       --
       clk.time = 60/bpm
       clk_reset:play_seq()
-      act('play_seq', seqs)
+      action('play_seq', Seqs)
     end
   }
 
   ii.jf.mode(1)
+  ii.wsyn.ar_mode(1)
+  
   ii.jf.run_mode(1)
   ii.jf.run(5)
-  ii.wsyn.ar_mode(1)
 
-  -- declare voices/sequencers:
+  -- declare Voices/sequencers:
   one = Voice:new{id = 'one',
     action = function(self, val)
       self.mod.degree = cv_degree
