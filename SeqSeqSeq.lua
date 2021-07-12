@@ -222,7 +222,6 @@ function init()
       bpm = linlin(txi.input[1], 0, 5, 10, 3000)
       clk_divider.division = selector(txi.input[2], div.x2, 0, 4)
       set(Voices, 'neg_harm', selector(txi.input[3], {false,true}, 0, 4))
-
       --
       clk.time = 60/bpm
       clk_reset:play_seq()
@@ -232,32 +231,36 @@ function init()
 
   ii.jf.mode(1)
   ii.wsyn.ar_mode(1)
-  
+
   ii.jf.run_mode(1)
   ii.jf.run(5)
 
   -- declare Voices/sequencers:
-  one = Voice:new{id = 'one',
+  one = Voice:new{id = 'one', octave = -1,
     action = function(self, val)
       self.mod.degree = cv_degree
       self.mod.octave = cv_octave
       self.seq[1].mod.division = val
-      self.mod.on = self:play_seq(2)
-    end
-  }
-  one:new_seq{sequence = {1,2}, division = 1, action = true}
-  one:new_seq{sequence = {true, false}, division = 4}
 
-  two = Voice:new{id = 'two', degree = 5, octave = -1,
+      self.seq[2].mod.division = selector(txi.param[1], div.x2, 0, 10)
+      self.mod.on = self:play_seq(2)
+    end
+  }
+  one:new_seq{sequence = {1}, division = 2, action = true}
+  one:new_seq{sequence = {true,false}}
+
+  two = Voice:new{id = 'two', degree = 5, octave = -2,
     action = function(self, val)
       self.mod.degree = cv_degree
       self.mod.octave = cv_octave
       self.seq[1].mod.division = val
+
+      self.seq[2].mod.division = selector(txi.param[1], div.x2, 0, 10)
       self.mod.on = self:play_seq(2)
     end
   }
-  two:new_seq{sequence = {2,1}, division = 3, action = true}
-  two:new_seq{sequence = {true, false}, division = 4}
+  two:new_seq{sequence = {1}, division = 3, action = true}
+  two:new_seq{sequence = {true,false}}
 
   --
   clk:start()
