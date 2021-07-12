@@ -262,6 +262,14 @@ function init()
   two:new_seq{sequence = {1}, division = 3, action = true}
   two:new_seq{sequence = {true,false}}
 
+  start_stop = Seq:new{
+    sequence = {
+      function() clk:start() print('start') end,
+      function() clk:stop() print('stop') end
+    },
+    action = function(fn) return fn() end
+  }
+
   --
   clk:start()
 end
