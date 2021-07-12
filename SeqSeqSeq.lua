@@ -18,6 +18,9 @@ cv_scale = lydian
 cv_degree = 1
 cv_octave = 0
 
+voices = {}
+seqs = {}
+
 txi = {param = {}, input = {}}
 
 Voice = {}
