@@ -206,12 +206,12 @@ function init()
   clk_reset = Seq:new{division = 256,
     action = function()
       clk_divider:reset()
-      act('reset', seqs)
       act('reset', voices)
+      act('reset', seqs)
     end
   }
 
-  clk_divider = Seq:new{
+  clk_divider = Seq:new{id = 'clk_divider',
     action = function()
       output[1](pulse(0.01))
       -- user defined:
