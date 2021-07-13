@@ -1,4 +1,4 @@
---- SeqseqSeq
+--- SeqSeqSeq
 
 lydian = {0,2,4,6,7,9,11}
 dorian = {0,2,3,5,7,9,10}
@@ -11,12 +11,13 @@ x2 = {1,2,4,8,16,32,64}
 odd = {1,3,5,7,9}
 even = {1,2,4,6,8,10}
 
-bpm = 60
 cv_scale = lydian
 cv_degree = 1
 cv_octave = 0
 
 txi = {param = {}, input = {}}
+
+bpm = 60
 
 Voice = {}
 Voices = {}
@@ -266,10 +267,10 @@ function init()
     end,
     action = function(self, val)
       self.mod.degree = cv_degree
-
+      self.seq[1].mod.division = val * selector(txi.param[4], even, 0, 10)
     end
   }
-  bass:new_seq{sequence = {1}, division = 8, action = true}
+  bass:new_seq{sequence = {4, 3,1, 2,2, 1,3}, action = true}
 
   start_stop = Seq:new{
     sequence = {
