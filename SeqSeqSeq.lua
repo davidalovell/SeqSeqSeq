@@ -48,7 +48,7 @@ function Voice:new(args)
   return o
 end
 
-function Voice:_on() return self.on and self.mod.on and self.prob >= math.random() and true or false end
+function Voice:_on() return self.on and self.mod.on and toss(self.prob) end
 function Voice:_level() return self.level * self.mod.level end
 function Voice:_octave() return self.octave + self.mod.octave + math.floor(self:_degree() / #self.scale) end
 function Voice:_degree() return (self.degree - 1) + (self.mod.degree - 1) end
@@ -135,6 +135,10 @@ end
 function Seq:reset()
   self.div_count = 0
   self.step_count = 0
+end
+
+function toss(weight, is_int)
+  return weight >= math.random() and (is_int and 1 or true) or (is_int and 0 or false)
 end
 
 function round(input)
@@ -239,13 +243,15 @@ function init()
       self.mod.degree = cv_degree
       self.mod.octave = cv_octave
 
+      self.prob = linlin(txi.param[3], 0, 10, 0, 1)
+
       self.seq[1].mod.division = val * selector(txi.param[2], even, 0, 10)
 
       self.seq[2].mod.division = selector(txi.param[1], x2, 0, 10)
       self.mod.on = self:play_seq(2)
     end
   }
-  one:new_seq{sequence = {1}, action = true}
+  one:new_seq{sequence = {1,3,4}, action = true}
   one:new_seq{sequence = {true,false}}
 
   two = Voice:new{id = 'two', degree = 5, octave = -2,
@@ -253,13 +259,15 @@ function init()
       self.mod.degree = cv_degree
       self.mod.octave = cv_octave
 
+      self.prob = linlin(txi.param[3], 0, 10, 0, 1)
+
       self.seq[1].mod.division = val * selector(txi.param[2], odd, 0, 10)
 
       self.seq[2].mod.division = selector(txi.param[1], x2, 0, 10)
       self.mod.on = self:play_seq(2)
     end
   }
-  two:new_seq{sequence = {1}, action = true}
+  two:new_seq{sequence = {1,2,1,4}, action = true}
   two:new_seq{sequence = {true,false}}
 
   bass = Voice:new{id = 'bass', octave = -2,
@@ -273,7 +281,7 @@ function init()
       self.mod.degree = (cv_degree - 1) + self:play_seq(2)
     end
   }
-  bass:new_seq{sequence = {4, 3,1, 2,2, 1,3}, action = true}
+  bass:new_seq{sequence = {4, 3,1, 2,2, 1,3}, division = 4, action = true}
   bass:new_seq{}
 
   start_stop = Seq:new{
