@@ -7,11 +7,9 @@ lydian = {0,2,4,6,7,9,11}
 mixolydian = {0,2,4,5,7,9,10}
 aeolian = {0,2,3,5,7,8,10}
 
-div = {
-  x2 = {1,2,4,8,16,32,64},
-  odd = {1,3,5,7,9},
-  even = {1,2,4,6,8,10}
-}
+x2 = {1,2,4,8,16,32,64}
+odd = {1,3,5,7,9}
+even = {1,2,4,6,8,10}
 
 bpm = 60
 cv_scale = lydian
@@ -101,8 +99,8 @@ function Seq:new(args)
   o.division = t.division == nil and 1 or t.division
   o.step = t.step == nil and 1 or t.step
   o.sequence = t.sequence == nil and {1} or t.sequence
-  o.behaviour = t.behaviour == nil and 'next' or t.behaviour
-  o.action = t.action == nil and nil or t.action
+  o.behaviour = t.behaviour
+  o.action = t.action
 
   o.mod = {division = 1, step = 1}
 
@@ -116,14 +114,12 @@ function Seq:_division() return self.division * self.mod.division end
 function Seq:_step() return self.step * self.mod.step end
 
 function Seq:_div_adv() return self.div_count % self:_division() + 1 end
-function Seq:_step_adv() return self.div_count == 1 and self:_behaviour() end
+function Seq:_step_adv() return self.div_count == 1 and self:_next() end
 
-function Seq:_behaviour()
-  return self.behaviour == 'next' and ( (self.step_count + self.step) - 1 ) % #self.sequence + 1
-    or self.behaviour == 'prev' and ( (self.step_count - self.step) - 1 ) % #self.sequence + 1
-    or self.behaviour == 'drunk' and clamper( ( (self.step_count + self.step * math.random(-1, 1) ) - 1 ) % #self.sequence + 1, 1, #self.sequence )
+function Seq:_next()
+  return self.behaviour == 'drunk' and clamper( ( (self.step_count + self:_step() * math.random(-1, 1) ) - 1 ) % #self.sequence + 1, 1, #self.sequence )
     or self.behaviour == 'random' and math.random(1, #self.sequence)
-    or self.step_count
+    or ( (self.step_count + self:_step()) - 1 ) % #self.sequence + 1
 end
 
 function Seq:_val() return self.sequence[self.step_count] end
@@ -220,7 +216,7 @@ function init()
       txi_getter()
       -- user defined:
       bpm = linlin(txi.input[1], 0, 5, 10, 3000)
-      clk_divider.division = selector(txi.input[2], div.x2, 0, 4)
+      clk_divider.division = selector(txi.input[2], x2, 0, 4)
       set(Voices, 'neg_harm', selector(txi.input[3], {false,true}, 0, 4))
       --
       clk.time = 60/bpm
@@ -240,10 +236,11 @@ function init()
     action = function(self, val)
       self.mod.degree = cv_degree
       self.mod.octave = cv_octave
-      self.seq[1].mod.division = val
+      self.seq[1].mod.division = val * selector(txi.param[2], even, 0, 10)
 
-      self.seq[2].mod.division = selector(txi.param[1], div.x2, 0, 10)
+      self.seq[2].mod.division = selector(txi.param[1], x2, 0, 10)
       self.mod.on = self:play_seq(2)
+
     end
   }
   one:new_seq{sequence = {1}, division = 2, action = true}
@@ -253,9 +250,9 @@ function init()
     action = function(self, val)
       self.mod.degree = cv_degree
       self.mod.octave = cv_octave
-      self.seq[1].mod.division = val
+      self.seq[1].mod.division = val * selector(txi.param[2], odd, 0, 10)
 
-      self.seq[2].mod.division = selector(txi.param[1], div.x2, 0, 10)
+      self.seq[2].mod.division = selector(txi.param[1], x2, 0, 10)
       self.mod.on = self:play_seq(2)
     end
   }
