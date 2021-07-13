@@ -236,28 +236,40 @@ function init()
     action = function(self, val)
       self.mod.degree = cv_degree
       self.mod.octave = cv_octave
+
       self.seq[1].mod.division = val * selector(txi.param[2], even, 0, 10)
 
       self.seq[2].mod.division = selector(txi.param[1], x2, 0, 10)
       self.mod.on = self:play_seq(2)
-
     end
   }
-  one:new_seq{sequence = {1}, division = 2, action = true}
+  one:new_seq{sequence = {1}, action = true}
   one:new_seq{sequence = {true,false}}
 
   two = Voice:new{id = 'two', degree = 5, octave = -2,
     action = function(self, val)
       self.mod.degree = cv_degree
       self.mod.octave = cv_octave
+
       self.seq[1].mod.division = val * selector(txi.param[2], odd, 0, 10)
 
       self.seq[2].mod.division = selector(txi.param[1], x2, 0, 10)
       self.mod.on = self:play_seq(2)
     end
   }
-  two:new_seq{sequence = {1}, division = 3, action = true}
+  two:new_seq{sequence = {1}, action = true}
   two:new_seq{sequence = {true,false}}
+
+  bass = Voice:new{id = 'bass', octave = -2,
+    synth = function(note, level)
+      ii.jf.play_voice(1, note, level)
+    end,
+    action = function(self, val)
+      self.mod.degree = cv_degree
+
+    end
+  }
+  bass:new_seq{sequence = {1}, division = 8, action = true}
 
   start_stop = Seq:new{
     sequence = {
