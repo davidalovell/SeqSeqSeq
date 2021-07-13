@@ -266,11 +266,14 @@ function init()
       ii.jf.play_voice(1, note, level)
     end,
     action = function(self, val)
-      self.mod.degree = cv_degree
       self.seq[1].mod.division = val * selector(txi.param[4], even, 0, 10)
+
+      self.seq[2].sequence = {1, 1,math.random(4,6), 1,1, 1,math.random(4,5)}
+      self.mod.degree = (cv_degree - 1) + self:play_seq(2)
     end
   }
   bass:new_seq{sequence = {4, 3,1, 2,2, 1,3}, action = true}
+  bass:new_seq{}
 
   start_stop = Seq:new{
     sequence = {
