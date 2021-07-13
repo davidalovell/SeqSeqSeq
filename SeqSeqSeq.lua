@@ -37,6 +37,7 @@ function Voice:new(args)
   o.transpose = t.transpose == nil and 0 or t.transpose
   o.scale = t.scale == nil and cv_scale or t.scale
   o.neg_harm = t.neg_harm == nil and false or t.neg_harm
+  o.prob = t.prob == nil and 1 or t.prob
   o.synth = t.synth == nil and function(note, level) ii.jf.play_note(note, level) end or t.synth
   o.action = t.action == nil and function(self, val) end or t.action
 
@@ -47,7 +48,7 @@ function Voice:new(args)
   return o
 end
 
-function Voice:_on() return self.on and self.mod.on end
+function Voice:_on() return self.on and self.mod.on and self.prob >= math.random() and true or false end
 function Voice:_level() return self.level * self.mod.level end
 function Voice:_octave() return self.octave + self.mod.octave + math.floor(self:_degree() / #self.scale) end
 function Voice:_degree() return (self.degree - 1) + (self.mod.degree - 1) end
