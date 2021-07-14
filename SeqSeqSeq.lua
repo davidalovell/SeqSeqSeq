@@ -115,9 +115,6 @@ end
 function Seq:_division() return self.division * self.mod.division end
 function Seq:_step() return self.step * self.mod.step end
 
-function Seq:_div_adv() return self.div_count % self:_division() + 1 end
-function Seq:_step_adv() return self.div_count == 1 and self:_next() end
-
 function Seq:_next()
   return self.behaviour == 'drunk' and clamper( ( (self.step_count + self:_step() * math.random(-1, 1) ) - 1 ) % #self.sequence + 1, 1, #self.sequence )
     or self.behaviour == 'random' and math.random(1, #self.sequence)
@@ -127,9 +124,9 @@ end
 function Seq:_val() return self.sequence[self.step_count] end
 
 function Seq:play_seq()
-  self.div_count = self:_div_adv() or self.div_count
-  self.step_count = self:_step_adv() or self.step_count
-  return self:_step_adv() and self.action ~= nil and self.action( self:_val() ) or self:_val()
+  self.div_count = self.div_count % self:_division() + 1
+  self.step_count = self.div_count == 1 and self:_next() or self.step_count
+  return self.div_count == 1 and self.action ~= nil and self.action( self:_val() ) or self:_val()
 end
 
 function Seq:reset()
