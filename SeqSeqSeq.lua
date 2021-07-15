@@ -221,6 +221,7 @@ function init()
       bpm = linlin(txi.input[1], 0, 5, 10, 3000)
       clk_divider.division = selector(txi.input[2], x2, 0, 4)
       set(Voices, 'neg_harm', selector(txi.input[3], {false,true}, 0, 4))
+      set({'one', 'two'}, 'prob', linlin(txi.param[3], 0, 10, 0, 1))
       --
       clk.time = 60/bpm
       clk_reset:play_seq()
@@ -240,7 +241,7 @@ function init()
       self.mod.degree = cv_degree
       self.mod.octave = cv_octave
 
-      self.prob = linlin(txi.param[3], 0, 10, 0, 1)
+      -- self.prob = linlin(txi.param[3], 0, 10, 0, 1)
 
       self.seq[1].mod.division = val * selector(txi.param[2], even, 0, 10)
 
@@ -256,7 +257,7 @@ function init()
       self.mod.degree = cv_degree
       self.mod.octave = cv_octave
 
-      self.prob = linlin(txi.param[3], 0, 10, 0, 1)
+      -- self.prob = linlin(txi.param[3], 0, 10, 0, 1)
 
       self.seq[1].mod.division = val * selector(txi.param[2], odd, 0, 10)
 
