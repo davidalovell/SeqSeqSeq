@@ -116,14 +116,10 @@ function Seq:_division() return self.division * self.mod.division end
 function Seq:_step() return self.step * self.mod.step end
 
 function Seq:_adv()
-  return self.behaviour == 'random' and self:_random()
-      or self.behaviour == 'drunk' and self:_drunk()
-      or self:_next()
+  return self.behaviour == 'random' and math.random(1, #self.sequence)
+      or self.behaviour == 'drunk' and clamper( ( (self.step_count + self:_step() * math.random(-1, 1) ) - 1 ) % #self.sequence + 1, 1, #self.sequence )
+      or ( (self.step_count + self:_step()) - 1 ) % #self.sequence + 1
 end
-
-function Seq:_random() return math.random(1, #self.sequence) end
-function Seq:_drunk() return clamper( ( (self.step_count + self:_step() * math.random(-1, 1) ) - 1 ) % #self.sequence + 1, 1, #self.sequence ) end
-function Seq:_next() return ( (self.step_count + self:_step()) - 1 ) % #self.sequence + 1 end
 
 function Seq:_val() return self.sequence[self.step_count] end
 
@@ -241,8 +237,6 @@ function init()
       self.mod.degree = cv_degree
       self.mod.octave = cv_octave
 
-      -- self.prob = linlin(txi.param[3], 0, 10, 0, 1)
-
       self.seq[1].mod.division = val * selector(txi.param[2], even, 0, 10)
 
       self.seq[2].mod.division = selector(txi.param[1], x2, 0, 10)
@@ -257,8 +251,6 @@ function init()
       self.mod.degree = cv_degree
       self.mod.octave = cv_octave
 
-      -- self.prob = linlin(txi.param[3], 0, 10, 0, 1)
-
       self.seq[1].mod.division = val * selector(txi.param[2], odd, 0, 10)
 
       self.seq[2].mod.division = selector(txi.param[1], x2, 0, 10)
@@ -267,6 +259,21 @@ function init()
   }
   two:new_seq{sequence = {1,2,1,4}, action = true}
   two:new_seq{sequence = {true,false}}
+
+  three = Voice:new{id = 'three', octave = 1,
+    synth = function(note, level)
+      ii.wsyn.play_note(note, level)
+    end,
+    action = function(self, val)
+      self.mod.degree = val
+      self.seq[1].mod.division = self:play_seq(2)
+      ii.wsyn.fm_ratio(self:play_seq(3), self:play_seq(4))
+    end
+  }
+  three:new_seq{sequence = {1,5,7}, action = true}
+  three:new_seq{sequence = {1,2,3,1,1,4}}
+  three:new_seq{sequence = {2,3,4,5,6,7,8}, step = 2}
+  three:new_seq{sequence = {1,1,2}}
 
   bass = Voice:new{id = 'bass', octave = -2,
     synth = function(note, level)
@@ -279,16 +286,8 @@ function init()
       self.mod.degree = (cv_degree - 1) + self:play_seq(2)
     end
   }
-  bass:new_seq{sequence = {4, 3,1, 2,2, 1,3}, division = 4, action = true}
+  bass:new_seq{sequence = {4, 3,1, 2,2, 1,3}, division = 2, action = true}
   bass:new_seq{}
-
-  start_stop = Seq:new{
-    sequence = {
-      function() clk:start() print('start') end,
-      function() clk:stop() print('stop') end
-    },
-    action = function(fn) return fn() end
-  }
 
   --
   clk:start()
