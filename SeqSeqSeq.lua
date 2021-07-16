@@ -100,12 +100,13 @@ function Seq:new(args)
 
   o.division = t.division == nil and 1 or t.division
   o.step = t.step == nil and 1 or t.step
+  o.offset = t.offset == nil and 0 or t.offset
   o.sequence = t.sequence == nil and {1} or t.sequence
-  o.behaviour = t.behaviour
   o.action = t.action
 
   o.mod = {division = 1, step = 1}
 
+  o.count = 0
   o.div_count = 0
   o.step_count = 0
 
@@ -115,31 +116,33 @@ end
 function Seq:_division() return self.division * self.mod.division end
 function Seq:_step() return self.step * self.mod.step end
 
-function Seq:_adv()
-  return self.behaviour == 'random' and math.random(1, #self.sequence)
-      or self.behaviour == 'drunk' and clamper( ( (self.step_count + self:_step() * math.random(-1, 1) ) - 1 ) % #self.sequence + 1, 1, #self.sequence )
-      or ( (self.step_count + self:_step()) - 1 ) % #self.sequence + 1
-end
-
 function Seq:_val() return self.sequence[self.step_count] end
 
 function Seq:play_seq()
-  self.div_count = self.div_count % self:_division() + 1
-  self.step_count = self.div_count == 1 and self:_adv() or self.step_count
-  return self.div_count == 1 and self.action ~= nil and self.action( self:_val() ) or self:_val()
+  self.count = self.count + 1
+  if self.count >= 1 then
+    self.div_count = self.div_count % self:_division() + 1
+    self.step_count = self.div_count == 1
+      and ((self.step_count + self:_step()) - 1 ) % #self.sequence + 1
+      or self.step_count
+    return self.div_count == 1 and self.action ~= nil
+      and self.action(self:_val())
+      or self:_val()
+  end
 end
 
 function Seq:reset()
+  self.count = 0 - self.offset
   self.div_count = 0
   self.step_count = 0
 end
 
-function round(input)
-  return input % 1 >= 0.5 and math.ceil(input) or math.floor(input)
-end
-
 function clamper(input, min, max)
   return math.min( math.max( min, input ), max )
+end
+
+function round(input)
+  return input % 1 >= 0.5 and math.ceil(input) or math.floor(input)
 end
 
 function linlin(input, range_min, range_max, output_min, output_max)
@@ -228,6 +231,7 @@ function init()
   ii.jf.mode(1)
   ii.wsyn.ar_mode(1)
 
+  -- module settings
   ii.jf.run_mode(1)
   ii.jf.run(5)
 
@@ -260,20 +264,18 @@ function init()
   two:new_seq{sequence = {1,2,1,4}, action = true}
   two:new_seq{sequence = {true,false}}
 
-  three = Voice:new{id = 'three', octave = 1,
+  sd = Voice:new{id = 'sd', octave = -2,
     synth = function(note, level)
+      ii.wsyn.lpg_symmetry(-5)
+      ii.wsyn.lpg_time(-math.random())
+      ii.wsyn.ramp(5)
       ii.wsyn.play_note(note, level)
     end,
     action = function(self, val)
-      self.mod.degree = val
-      self.seq[1].mod.division = self:play_seq(2)
-      ii.wsyn.fm_ratio(self:play_seq(3), self:play_seq(4))
+      self.seq[1].mod.division = val
     end
   }
-  three:new_seq{sequence = {1,5,7}, action = true}
-  three:new_seq{sequence = {1,2,3,1,1,4}}
-  three:new_seq{sequence = {2,3,4,5,6,7,8}, step = 2}
-  three:new_seq{sequence = {1,1,2}}
+  sd:new_seq{sequence = {16,1,2,13}, division = 1, offset = 8, action = true}
 
   bass = Voice:new{id = 'bass', octave = -2,
     synth = function(note, level)
@@ -292,3 +294,5 @@ function init()
   --
   clk:start()
 end
+
+ii.wsyn.event = function(e, val) print(e.name, val) end
