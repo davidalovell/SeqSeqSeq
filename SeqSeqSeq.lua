@@ -139,7 +139,7 @@ function Seq:reset()
   self.step_count = 0
 end
 
-function clamper(x, min, max)
+function clmp(x, min, max)
   return math.min( math.max( min, x ), max )
 end
 
@@ -147,14 +147,14 @@ function round(x)
   return x % 1 >= 0.5 and math.ceil(x) or math.floor(x)
 end
 
-function linlin(x, range_min, range_max, output_min, output_max)
-  return (x - range_min) * (output_max - output_min) / (range_max - range_min) + output_min
+function linlin(x, in_min, in_max, out_min, out_max)
+  return (x - in_min) * (out_max - out_min) / (in_max - in_min) + out_min
 end
 
-function selector(x, table, range_min, range_max, min, max)
-  min = min or 1
-  max = max or #table
-  return table[ clamper( round( linlin( x, range_min, range_max, min, max ) ), min, max ) ]
+function selector(x, data, in_min, in_max, out_min, out_max)
+  out_min = out_min or 1
+  out_max = out_max or #data
+  return data[ clmp( round( linlin( x, in_min, in_max, out_min, out_max ) ), out_min, out_max ) ]
 end
 
 function set(names, property, val)
