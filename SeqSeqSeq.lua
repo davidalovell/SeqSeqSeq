@@ -120,14 +120,18 @@ function Seq:_val() return self.sequence[self.step_count] end
 
 function Seq:play_seq()
   self.count = self.count + 1
+
   if self.count >= 1 then
     self.div_count = self.div_count % self:_division() + 1
+    
     self.step_count = self.div_count == 1
       and ((self.step_count + self:_step()) - 1 ) % #self.sequence + 1
       or self.step_count
+
     return self.div_count == 1 and self.action ~= nil
       and self.action(self:_val())
       or self:_val()
+
   end
 end
 
