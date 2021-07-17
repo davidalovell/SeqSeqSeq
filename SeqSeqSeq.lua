@@ -130,7 +130,7 @@ function Seq:play_seq()
 
   return self.count >= 1 and self.div_count == 1 and self.action ~= nil
     and self.action(self:_val())
-    or self:_val()
+    or self:_val() or 0
 end
 
 function Seq:reset()
