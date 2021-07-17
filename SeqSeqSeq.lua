@@ -106,7 +106,7 @@ function Seq:new(args)
 
   o.mod = {division = 1, step = 1}
 
-  o.count = 0
+  o.count = - o.offset
   o.div_count = 0
   o.step_count = 0
 
@@ -134,7 +134,7 @@ function Seq:play_seq()
 end
 
 function Seq:reset()
-  self.count = 0 - self.offset
+  self.count = - self.offset
   self.div_count = 0
   self.step_count = 0
 end
