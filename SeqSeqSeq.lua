@@ -115,24 +115,22 @@ end
 
 function Seq:_division() return self.division * self.mod.division end
 function Seq:_step() return self.step * self.mod.step end
-
 function Seq:_val() return self.sequence[self.step_count] end
 
 function Seq:play_seq()
   self.count = self.count + 1
 
-  if self.count >= 1 then
-    self.div_count = self.div_count % self:_division() + 1
-    
-    self.step_count = self.div_count == 1
-      and ((self.step_count + self:_step()) - 1 ) % #self.sequence + 1
-      or self.step_count
+  self.div_count = self.count >= 1
+    and self.div_count % self:_division() + 1
+    or self.div_count
 
-    return self.div_count == 1 and self.action ~= nil
-      and self.action(self:_val())
-      or self:_val()
+  self.step_count = self.count >= 1 and self.div_count == 1
+    and ((self.step_count + self:_step()) - 1) % #self.sequence + 1
+    or self.step_count
 
-  end
+  return self.count >= 1 and self.div_count == 1 and self.action ~= nil
+    and self.action(self:_val())
+    or self:_val()
 end
 
 function Seq:reset()
