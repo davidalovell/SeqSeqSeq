@@ -1,4 +1,5 @@
-# SeqSeqSeq
+# SeqSeqSeq (INCOMPLETE)
+
 A crow script that allows you to create multiple voice and sequencer objects.  
 This was designed to be part of this small system:
 
@@ -39,11 +40,11 @@ Voice:new{
                                   -- (set CV_scale to the scale setting of your external CV source)
   neg_harm = false                -- defaults to false
                                   -- (plays the negative harmony equivalent of the note based on the selected scale)
-  
+
   synth = function(note, level)   -- defaults to this function which plays a note on Just Friends
     ii.jf.play_note(note, level)
   end,
-  
+
   action = function(self, val)    -- defaults to this empty function, the idea is to add custom commands to this
   end
 }
