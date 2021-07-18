@@ -48,7 +48,7 @@ function Voice:new(args)
   return o
 end
 
-function Voice:_on() return self.on and self.mod.on and self.prob >= math.random() and true or false end
+function Voice:_on() return self.on and self.mod.on and self.prob >= math.random() end
 function Voice:_level() return self.level * self.mod.level end
 function Voice:_octave() return self.octave + self.mod.octave + math.floor(self:_degree() / #self.scale) end
 function Voice:_degree() return (self.degree - 1) + (self.mod.degree - 1) end
