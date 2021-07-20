@@ -99,12 +99,19 @@ function Seq:new(args)
   end
 
 <<<<<<< HEAD
+<<<<<<< HEAD
   o.sequence = t.sequence == nil and {1} or t.sequence
   o.division = t.division == nil and 1 or t.division
   o.step = t.step == nil and 1 or t.step
   o.offset = t.offset == nil and 0 or t.offset
   o.on = t.on == nil and true or t.on
   o.prob = t.prob == nil and 1 or t.prob
+=======
+  o.division = t.division == nil and 1 or t.division
+  o.step = t.step == nil and 1 or t.step
+  o.offset = t.offset == nil and 0 or t.offset
+  o.sequence = t.sequence == nil and {1} or t.sequence
+>>>>>>> parent of 0ad7c1c (changed prob from voice to seq)
 =======
   o.division = t.division == nil and 1 or t.division
   o.step = t.step == nil and 1 or t.step
@@ -128,6 +135,7 @@ function Seq:_val() return self.sequence[self.step_count] end
 
 function Seq:play_seq()
   self.count = self.count + 1
+<<<<<<< HEAD
 
   self.div_count = self.count >= 1
     and self.div_count % self:_division() + 1
@@ -137,6 +145,16 @@ function Seq:play_seq()
   s.next = s.on and s.prob >= math.random()
   s.ix = s.next and s.step_count or s.ix
 =======
+  self.step_count = self.count >= 1 and self.div_count == 1
+    and ((self.step_count + self:_step()) - 1) % #self.sequence + 1
+    or self.step_count
+>>>>>>> parent of 0ad7c1c (changed prob from voice to seq)
+=======
+
+  self.div_count = self.count >= 1
+    and self.div_count % self:_division() + 1
+    or self.div_count
+
   self.step_count = self.count >= 1 and self.div_count == 1
     and ((self.step_count + self:_step()) - 1) % #self.sequence + 1
     or self.step_count
