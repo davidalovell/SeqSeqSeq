@@ -98,9 +98,10 @@ function Seq:new(args)
   end
 
   o.sequence = t.sequence == nil and {1} or t.sequence
-  o.step = t.step == nil and 1 or t.step
   o.division = t.division == nil and 1 or t.division
+  o.step = t.step == nil and 1 or t.step
   o.offset = t.offset == nil and 0 or t.offset
+  o.on = t.on == nil and true or t.on
   o.prob = t.prob == nil and 1 or t.prob
   o.action = t.action
 
@@ -129,7 +130,7 @@ function Seq:play_seq()
     and ((s.step_count + s:_step()) - 1) % #s.sequence + 1
     or s.step_count
 
-  s.next = s.prob >= math.random()
+  s.next = s.on and s.prob >= math.random()
   s.ix = s.next and s.step_count or s.ix
 
   return s.next and s.count >= 1 and s.div_count == 1 and s.action ~= nil
