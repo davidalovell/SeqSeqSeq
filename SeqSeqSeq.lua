@@ -37,6 +37,7 @@ function Voice:new(args)
   o.transpose = t.transpose == nil and 0 or t.transpose
   o.scale = t.scale == nil and cv_scale or t.scale
   o.neg_harm = t.neg_harm == nil and false or t.neg_harm
+  o.prob = t.prob == nil and 1 or t.prob
   o.synth = t.synth == nil and function(note, level) ii.jf.play_note(note, level) end or t.synth
   o.action = t.action == nil and function(self, val) end or t.action
 
@@ -47,7 +48,7 @@ function Voice:new(args)
   return o
 end
 
-function Voice:_on() return self.on and self.mod.on end
+function Voice:_on() return self.on and self.mod.on and self.prob >= math.random() end
 function Voice:_level() return self.level * self.mod.level end
 function Voice:_octave() return self.octave + self.mod.octave + math.floor(self:_degree() / #self.scale) end
 function Voice:_degree() return (self.degree - 1) + (self.mod.degree - 1) end
@@ -97,12 +98,19 @@ function Seq:new(args)
     Seqs[o.id] = o.id
   end
 
+<<<<<<< HEAD
   o.sequence = t.sequence == nil and {1} or t.sequence
   o.division = t.division == nil and 1 or t.division
   o.step = t.step == nil and 1 or t.step
   o.offset = t.offset == nil and 0 or t.offset
   o.on = t.on == nil and true or t.on
   o.prob = t.prob == nil and 1 or t.prob
+=======
+  o.division = t.division == nil and 1 or t.division
+  o.step = t.step == nil and 1 or t.step
+  o.offset = t.offset == nil and 0 or t.offset
+  o.sequence = t.sequence == nil and {1} or t.sequence
+>>>>>>> parent of 0ad7c1c (changed prob from voice to seq)
   o.action = t.action
 
   o.mod = {division = 1, step = 1}
@@ -110,39 +118,39 @@ function Seq:new(args)
   o.count = - o.offset
   o.div_count = 0
   o.step_count = 0
-  o.ix = 1
 
   return o
 end
 
 function Seq:_division() return self.division * self.mod.division end
 function Seq:_step() return self.step * self.mod.step end
+function Seq:_val() return self.sequence[self.step_count] end
 
 function Seq:play_seq()
-  local s = self
-  s.count = s.count + 1
+  self.count = self.count + 1
 
-  s.div_count = s.count >= 1
-    and s.div_count % s:_division() + 1
-    or s.div_count
+  self.div_count = self.count >= 1
+    and self.div_count % self:_division() + 1
+    or self.div_count
 
-  s.step_count = s.count >= 1 and s.div_count == 1
-    and ((s.step_count + s:_step()) - 1) % #s.sequence + 1
-    or s.step_count
-
+<<<<<<< HEAD
   s.next = s.on and s.prob >= math.random()
   s.ix = s.next and s.step_count or s.ix
+=======
+  self.step_count = self.count >= 1 and self.div_count == 1
+    and ((self.step_count + self:_step()) - 1) % #self.sequence + 1
+    or self.step_count
+>>>>>>> parent of 0ad7c1c (changed prob from voice to seq)
 
-  return s.next and s.count >= 1 and s.div_count == 1 and s.action ~= nil
-    and s.action(s.sequence[s.ix])
-    or s.sequence[s.ix] or 0
+  return self.count >= 1 and self.div_count == 1 and self.action ~= nil
+    and self.action(self:_val())
+    or self:_val() or 0
 end
 
 function Seq:reset()
   self.count = - self.offset
   self.div_count = 0
   self.step_count = 0
-  self.ix = 1
 end
 
 function clmp(x, min, max)
@@ -228,6 +236,7 @@ function init()
       bpm = linlin(txi.input[1], 0, 5, 10, 3000)
       clk_divider.division = selector(txi.input[2], x2, 0, 4)
       set(Voices, 'neg_harm', selector(txi.input[3], {false,true}, 0, 4))
+      set({'one', 'two'}, 'prob', linlin(txi.param[3], 0, 10, 0, 1))
       --
       clk.time = 60/bpm
       clk_reset:play_seq()
@@ -249,7 +258,6 @@ function init()
       self.mod.octave = cv_octave
 
       self.seq[1].mod.division = val * selector(txi.param[2], even, 0, 10)
-      self.seq[1].prob = linlin(txi.param[3], 0, 10, 0, 1)
 
       self.seq[2].mod.division = selector(txi.param[1], x2, 0, 10)
       self.mod.on = self:play_seq(2)
@@ -264,7 +272,6 @@ function init()
       self.mod.octave = cv_octave
 
       self.seq[1].mod.division = val * selector(txi.param[2], odd, 0, 10)
-      self.seq[1].prob = linlin(txi.param[3], 0, 10, 0, 1)
 
       self.seq[2].mod.division = selector(txi.param[1], x2, 0, 10)
       self.mod.on = self:play_seq(2)
@@ -284,7 +291,7 @@ function init()
       self.seq[1].mod.division = val
     end
   }
-  sd:new_seq{sequence = {16,4,12,16,4,2,10}, division = 1, offset = 8, action = true}
+  sd:new_seq{sequence = {16,1,2,13}, division = 1, offset = 8, action = true}
 
   bass = Voice:new{id = 'bass', octave = -2,
     synth = function(note, level)
