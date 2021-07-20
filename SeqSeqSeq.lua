@@ -109,15 +109,16 @@ function Seq:new(args)
   o.count = - o.offset
   o.div_count = 0
   o.step_count = 0
-  o.ix = 1
 
   return o
 end
 
 function Seq:_division() return self.division * self.mod.division end
 function Seq:_step() return self.step * self.mod.step end
+function Seq:_val() return self.sequence[self.step_count] end
 
 function Seq:play_seq()
+<<<<<<< HEAD
   local s = self
   s.count = s.count + 1
 
@@ -128,20 +129,33 @@ function Seq:play_seq()
   s.step_count = s.count >= 1 and s.div_count == 1
     and ((s.step_count + self:_step()) - 1) % #s.sequence + 1
     or s.step_count
+=======
+  self.count = self.count + 1
 
-  s.next = s.prob >= math.random()
-  s.ix = s.next and s.step_count or s.ix
+  self.div_count = self.count >= 1
+    and self.div_count % self:_division() + 1
+    or self.div_count
+>>>>>>> parent of 0ad7c1c (changed prob from voice to seq)
 
+  self.step_count = self.count >= 1 and self.div_count == 1
+    and ((self.step_count + self:_step()) - 1) % #self.sequence + 1
+    or self.step_count
+
+<<<<<<< HEAD
   return  s.next and s.count >= 1 and s.div_count == 1 and s.action ~= nil
     and s.action(self.sequence[self.step_count])
     or self.sequence[self.step_count] or 0
+=======
+  return self.count >= 1 and self.div_count == 1 and self.action ~= nil
+    and self.action(self:_val())
+    or self:_val() or 0
+>>>>>>> parent of 0ad7c1c (changed prob from voice to seq)
 end
 
 function Seq:reset()
   self.count = - self.offset
   self.div_count = 0
   self.step_count = 0
-  self.ix = 1
 end
 
 function clmp(x, min, max)
@@ -227,7 +241,11 @@ function init()
       bpm = linlin(txi.input[1], 0, 5, 10, 3000)
       clk_divider.division = selector(txi.input[2], x2, 0, 4)
       set(Voices, 'neg_harm', selector(txi.input[3], {false,true}, 0, 4))
+<<<<<<< HEAD
       -- set({'one', 'two'}, 'prob', linlin(txi.param[3], 0, 10, 0, 1))
+=======
+      set({'one', 'two'}, 'prob', linlin(txi.param[3], 0, 10, 0, 1))
+>>>>>>> parent of 0ad7c1c (changed prob from voice to seq)
       --
       clk.time = 60/bpm
       clk_reset:play_seq()
