@@ -284,7 +284,7 @@ function init()
       self.seq[1].mod.division = val
     end
   }
-  sd:new_seq{sequence = {16,4,12, 16,4,2,1,9}, offset = 8, action = true}
+  sd:new_seq{sequence = {16,4,12, 16,4,2,1,9}, offset = 8, prob = 0.9, action = true}
 
   bass = Voice:new{id = 'bass', octave = -2,
     synth = function(note, level)
