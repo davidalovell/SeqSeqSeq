@@ -98,26 +98,10 @@ function Seq:new(args)
     Seqs[o.id] = o.id
   end
 
-<<<<<<< HEAD
-<<<<<<< HEAD
-  o.sequence = t.sequence == nil and {1} or t.sequence
-  o.division = t.division == nil and 1 or t.division
-  o.step = t.step == nil and 1 or t.step
-  o.offset = t.offset == nil and 0 or t.offset
-  o.on = t.on == nil and true or t.on
-  o.prob = t.prob == nil and 1 or t.prob
-=======
   o.division = t.division == nil and 1 or t.division
   o.step = t.step == nil and 1 or t.step
   o.offset = t.offset == nil and 0 or t.offset
   o.sequence = t.sequence == nil and {1} or t.sequence
->>>>>>> parent of 0ad7c1c (changed prob from voice to seq)
-=======
-  o.division = t.division == nil and 1 or t.division
-  o.step = t.step == nil and 1 or t.step
-  o.offset = t.offset == nil and 0 or t.offset
-  o.sequence = t.sequence == nil and {1} or t.sequence
->>>>>>> parent of 0ad7c1c (changed prob from voice to seq)
   o.action = t.action
 
   o.mod = {division = 1, step = 1}
@@ -125,6 +109,7 @@ function Seq:new(args)
   o.count = - o.offset
   o.div_count = 0
   o.step_count = 0
+  o.ix = 1
 
   return o
 end
@@ -134,41 +119,30 @@ function Seq:_step() return self.step * self.mod.step end
 function Seq:_val() return self.sequence[self.step_count] end
 
 function Seq:play_seq()
-  self.count = self.count + 1
-<<<<<<< HEAD
+  local s = self
+  s.count = s.count + 1
 
-  self.div_count = self.count >= 1
-    and self.div_count % self:_division() + 1
-    or self.div_count
+  s.div_count = s.count >= 1
+    and s.div_count % self:_division() + 1
+    or s.div_count
 
-<<<<<<< HEAD
-  s.next = s.on and s.prob >= math.random()
+  s.step_count = s.count >= 1 and s.div_count == 1
+    and ((s.step_count + self:_step()) - 1) % #s.sequence + 1
+    or s.step_count
+
+  s.next = s.prob >= math.random()
   s.ix = s.next and s.step_count or s.ix
-=======
-  self.step_count = self.count >= 1 and self.div_count == 1
-    and ((self.step_count + self:_step()) - 1) % #self.sequence + 1
-    or self.step_count
->>>>>>> parent of 0ad7c1c (changed prob from voice to seq)
-=======
 
-  self.div_count = self.count >= 1
-    and self.div_count % self:_division() + 1
-    or self.div_count
-
-  self.step_count = self.count >= 1 and self.div_count == 1
-    and ((self.step_count + self:_step()) - 1) % #self.sequence + 1
-    or self.step_count
->>>>>>> parent of 0ad7c1c (changed prob from voice to seq)
-
-  return self.count >= 1 and self.div_count == 1 and self.action ~= nil
-    and self.action(self:_val())
-    or self:_val() or 0
+  return s.count >= 1 and s.div_count == 1 and s.action ~= nil
+    and s.action(self:_val())
+    or self:_val()
 end
 
 function Seq:reset()
   self.count = - self.offset
   self.div_count = 0
   self.step_count = 0
+  self.ix = 1
 end
 
 function clmp(x, min, max)
