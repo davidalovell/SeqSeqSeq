@@ -116,7 +116,6 @@ end
 
 function Seq:_division() return self.division * self.mod.division end
 function Seq:_step() return self.step * self.mod.step end
-function Seq:_val() return self.sequence[self.step_count] end
 
 function Seq:play_seq()
   local s = self
@@ -133,9 +132,9 @@ function Seq:play_seq()
   s.next = s.prob >= math.random()
   s.ix = s.next and s.step_count or s.ix
 
-  return s.count >= 1 and s.div_count == 1 and s.action ~= nil
-    and s.action(self:_val())
-    or self:_val()
+  return  s.next and s.count >= 1 and s.div_count == 1 and s.action ~= nil
+    and s.action(self.sequence[self.step_count])
+    or self.sequence[self.step_count] or 0
 end
 
 function Seq:reset()
@@ -228,7 +227,7 @@ function init()
       bpm = linlin(txi.input[1], 0, 5, 10, 3000)
       clk_divider.division = selector(txi.input[2], x2, 0, 4)
       set(Voices, 'neg_harm', selector(txi.input[3], {false,true}, 0, 4))
-      set({'one', 'two'}, 'prob', linlin(txi.param[3], 0, 10, 0, 1))
+      -- set({'one', 'two'}, 'prob', linlin(txi.param[3], 0, 10, 0, 1))
       --
       clk.time = 60/bpm
       clk_reset:play_seq()
