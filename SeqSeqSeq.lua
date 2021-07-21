@@ -57,7 +57,7 @@ function Voice:play_note()
   local s = self
   s.pos = s.scale[s:_degree() % #s.scale + 1] + s:_transpose()
   s.neg = (7 - s.pos) % 12
-  s.note = (s.neg_harm and s.neg or s.pos / 12 + s:_octave()
+  s.note = (s.neg_harm and s.neg or s.pos) / 12 + s:_octave()
   return s:_on() and s.synth( s.note, s:_level() )
 end
 
