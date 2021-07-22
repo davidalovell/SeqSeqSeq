@@ -287,7 +287,6 @@ function init()
     end
   }
   sd:new_seq{sequence = {20,12, 20,2,1,9}, offset = 8, prob = 0.5, action = true}
-  sd:new_seq{offset = 7, division = 16, prob = 0.7, action = true}
   sd:new_seq{offset = 8, division = 16, action = true}
 
   bass = Voice:new{id = 'bass', octave = -2,
