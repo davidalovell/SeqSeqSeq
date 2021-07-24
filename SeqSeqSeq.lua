@@ -53,11 +53,13 @@ function Voice:_octave() return self.octave + self.mod.octave + math.floor(self:
 function Voice:_degree() return (self.degree - 1) + (self.mod.degree - 1) end
 function Voice:_transpose() return self.transpose + self.mod.transpose end
 
-function Voice:_pos() return self.scale[ self:_degree() % #self.scale + 1 ] + self:_transpose() end
-function Voice:_neg() return ( 7 - self:_pos() ) % 12 end
-function Voice:_note() return ( self.neg_harm and self:_neg() or self:_pos() ) / 12 + self:_octave() end
-
-function Voice:play_note() return self:_on() and self.synth( self:_note(), self:_level() ) end
+function Voice:play_note()
+  local s = self
+  s.pos = s.scale[s:_degree() % #s.scale + 1] + s:_transpose()
+  s.neg = (7 - s.pos) % 12
+  s.note = (s.neg_harm and s.neg or s.pos) / 12 + s:_octave()
+  return s:_on() and s.synth( s.note, s:_level() )
+end
 
 function Voice:play_voice(val)
   self:action(val)
@@ -67,7 +69,7 @@ end
 function Voice:new_seq(args)
   local t = args or {}
   t.action = type(t.action) == 'function' and t.action or t.action and function(val) self:play_voice(val) end
-  self.seq[t.index == nil and #self.seq + 1 or t.index] = Seq:new(t)
+  self.seq[#self.seq + 1] = Seq:new(t)
 end
 
 function Voice:play_seq(index)
@@ -284,7 +286,8 @@ function init()
       self.seq[1].mod.division = val
     end
   }
-  sd:new_seq{sequence = {16,4,12, 16,4,2,1,9}, offset = 8, prob = 0.9, action = true}
+  sd:new_seq{sequence = {20,12, 20,2,1,9}, offset = 8, prob = 0.5, action = true}
+  sd:new_seq{offset = 8, division = 16, action = true}
 
   bass = Voice:new{id = 'bass', octave = -2,
     synth = function(note, level)
