@@ -24,6 +24,12 @@ Voices = {}
 function Voice:new(args)
   local o = setmetatable( {}, {__index = Voice} )
   local t = args or {}
+  
+	--if t.group ~= nil and t.id ~= nil then
+	--	_G[o.group] = {}
+	--	o.id = t.id
+	--	_G[o.group][o.id] = o.id
+	--end
 
   if t.id ~= nil then
     o.id = t.id
