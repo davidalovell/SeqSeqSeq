@@ -26,8 +26,8 @@ function Voice:new(args)
   local t = args or {}
   
 	--if t.group ~= nil and t.id ~= nil then
-	--	_G[o.group] = {}
-	--	o.id = t.id
+	--	o.group, o.id = t.group, t.id
+	--	_G[o.group] = _G[o.group] == nil and {} or _G[o.group]
 	--	_G[o.group][o.id] = o.id
 	--end
 
