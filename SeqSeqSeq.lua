@@ -24,12 +24,6 @@ Voices = {}
 function Voice:new(args)
   local o = setmetatable( {}, {__index = Voice} )
   local t = args or {}
-	
-	--o.group, o.id = t.group, t.id
-	--if o.group ~= nil and o.id ~= nil then
-	--	_G[o.group] = _G[o.group] == nil and {} or _G[o.group]
-	--	_G[o.group][o.id] = o.id
-	--end
 
   if t.id ~= nil then
     o.id = t.id
@@ -74,7 +68,6 @@ end
 
 function Voice:new_seq(args)
   local t = args or {}
-	--t.group = t.group == nil and self.id .. '_seqs' or t.group -- double check
   t.action = type(t.action) == 'function' and t.action or t.action and function(val) self:play_voice(val) end
   self.seq[#self.seq + 1] = Seq:new(t)
 end
@@ -100,12 +93,6 @@ Seqs = {}
 function Seq:new(args)
   local o = setmetatable( {}, {__index = Seq} )
   local t = args or {}
-	
-	--o.group, o.id = t.group, t.id
-	--if o.group ~= nil and o.id ~= nil then
-	--	_G[o.group] = _G[o.group] == nil and {} or _G[o.group]
-	--	_G[o.group][o.id] = o.id
-	--end
 
   if t.id ~= nil then
     o.id = t.id
