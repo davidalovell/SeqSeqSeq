@@ -229,7 +229,8 @@ function init()
       -- user defined:
       bpm = linlin(txi.input[1], 0, 5, 10, 3000)
       clk_divider.division = selector(txi.input[2], pow2, 0, 4)
-      set(Voices, 'neg_harm', selector(txi.input[3], {false,true}, 0, 4))
+      set({'one','two','bass'}, 'level', linlin(txi.input[3], 0, 10, 0, 2))
+      set({'sd'}, 'level', linlin(txi.input[4], 0, 10, 0, 1))
       --
       clk.time = 60/bpm
       clk_reset:play_seq()
