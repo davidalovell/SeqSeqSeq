@@ -18,6 +18,7 @@ cv_octave = 0
 txi = {param = {}, input = {}}
 
 bpm = 60
+pw = 0.001
 
 Voice = {}
 Voices = {}
@@ -40,25 +41,29 @@ function Voice:new(args)
   o.synth = t.synth == nil and function(note, level) ii.jf.play_note(note, level) end or t.synth
   o.action = t.action == nil and function(self, val) end or t.action
 
-  o.mod = {on = true, level = 1, octave = 0, degree = 1, transpose = 0}
+  o._on = true
+  o._level = 1
+  o._octave = 0
+  o._degree = 1
+  o._transpose = 0
 
   o.seq = {}
 
   return o
 end
 
-function Voice:_on() return self.on and self.mod.on end
-function Voice:_level() return self.level * self.mod.level end
-function Voice:_octave() return self.octave + self.mod.octave + math.floor(self:_degree() / #self.scale) end
-function Voice:_degree() return (self.degree - 1) + (self.mod.degree - 1) end
-function Voice:_transpose() return self.transpose + self.mod.transpose end
+function Voice:__on() return self.on and self._on end
+function Voice:__level() return self.level * self._level end
+function Voice:__octave() return self.octave + self._octave + math.floor(self:__degree() / #self.scale) end
+function Voice:__degree() return (self.degree - 1) + (self._degree - 1) end
+function Voice:__transpose() return self.transpose + self._transpose end
 
 function Voice:play_note()
   local s = self
-  s.pos = s.scale[s:_degree() % #s.scale + 1] + s:_transpose()
+  s.pos = s.scale[s:__degree() % #s.scale + 1] + s:__transpose()
   s.neg = (7 - s.pos) % 12
-  s.note = (s.neg_harm and s.neg or s.pos) / 12 + s:_octave()
-  return s:_on() and s.synth( s.note, s:_level() )
+  s.note = (s.neg_harm and s.neg or s.pos) / 12 + s:__octave()
+  return s:__on() and s.synth( s.note, s:__level() )
 end
 
 function Voice:play_voice(val)
@@ -107,7 +112,8 @@ function Seq:new(args)
   o.offset = t.offset == nil and 0 or t.offset
   o.action = t.action
 
-  o.mod = {division = 1, step = 1}
+  o._division = 1
+  o._step = 1
 
   o.count = - o.offset
   o.div_count = 0
@@ -117,19 +123,19 @@ function Seq:new(args)
   return o
 end
 
-function Seq:_division() return self.division * self.mod.division end
-function Seq:_step() return self.step * self.mod.step end
+function Seq:__division() return self.division * self._division end
+function Seq:__step() return self.step * self._step end
 
 function Seq:play_seq()
   local s = self
   s.count = s.count + 1
 
   s.div_count = s.count >= 1
-    and s.div_count % s:_division() + 1
+    and s.div_count % s:__division() + 1
     or s.div_count
 
   s.step_count = s.count >= 1 and s.div_count == 1
-    and ((s.step_count + s:_step()) - 1) % #s.sequence + 1
+    and ((s.step_count + s:__step()) - 1) % #s.sequence + 1
     or s.step_count
 
   s.next = (s.count - 1) % s.every == 0 and s.prob >= math.random()
@@ -217,7 +223,7 @@ function init()
 
   clk_divider = Seq:new{id = 'clk_divider',
     action = function()
-      output[1](pulse(0.01))
+      output[1](pulse(pw))
       -- user defined:
 
     end
@@ -248,14 +254,14 @@ function init()
   -- declare Voices/sequencers:
   one = Voice:new{id = 'one', octave = -1,
     action = function(self, val)
-      self.mod.degree = cv_degree
-      self.mod.octave = cv_octave
+      self._degree = cv_degree
+      self._octave = cv_octave
 
-      self.seq[1].mod.division = val * selector(txi.param[2], even, 0, 10)
+      self.seq[1]._division = val * selector(txi.param[2], even, 0, 10)
       self.seq[1].prob = linlin(txi.param[3], 0, 10, 0, 1)
 
-      self.seq[2].mod.division = selector(txi.param[1], pow2, 0, 10)
-      self.mod.on = self:play_seq(2)
+      self.seq[2]._division = selector(txi.param[1], pow2, 0, 10)
+      self._on = self:play_seq(2)
     end
   }
   one:new_seq{sequence = {1,3,4}, action = true}
@@ -263,14 +269,14 @@ function init()
 
   two = Voice:new{id = 'two', degree = 5, octave = -2,
     action = function(self, val)
-      self.mod.degree = cv_degree
-      self.mod.octave = cv_octave
+      self._degree = cv_degree
+      self._octave = cv_octave
 
-      self.seq[1].mod.division = val * selector(txi.param[2], odd, 0, 10)
+      self.seq[1]._division = val * selector(txi.param[2], odd, 0, 10)
       self.seq[1].prob = linlin(txi.param[3], 0, 10, 0, 1)
 
-      self.seq[2].mod.division = selector(txi.param[1], even, 0, 10)
-      self.mod.on = self:play_seq(2)
+      self.seq[2]._division = selector(txi.param[1], even, 0, 10)
+      self._on = self:play_seq(2)
     end
   }
   two:new_seq{sequence = {1,2,1,4}, action = true}
@@ -284,7 +290,7 @@ function init()
       ii.wsyn.play_note(note, level)
     end,
     action = function(self, val)
-      self.seq[1].mod.division = val
+      self.seq[1]._division = val
     end
   }
   sd:new_seq{sequence = {20,12, 20,2,1,9}, offset = 8, prob = 0.5, action = true}
@@ -295,12 +301,12 @@ function init()
       ii.jf.play_voice(1, note, level)
     end,
     action = function(self, val)
-      self.seq[1].mod.division = val
+      self.seq[1]._division = val
 
       self.seq[1].every = selector(txi.param[4], pow2, 0, 10)
 
       self.seq[2].sequence = {1, 1,math.random(4,6), 1,1, 1,math.random(4,5)}
-      self.mod.degree = (cv_degree - 1) + self:play_seq(2)
+      self._degree = (cv_degree - 1) + self:play_seq(2)
     end
   }
   bass:new_seq{sequence = {4, 3,1, 2,2, 1,3}, division = 4, action = true}
