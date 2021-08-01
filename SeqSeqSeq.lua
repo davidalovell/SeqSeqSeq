@@ -11,7 +11,7 @@ pow2 = {1,2,4,8,16,32,64}
 odd = {1,3,5,7,9}
 even = {1,2,4,6,8,10}
 
-cv_scale = lydian
+cv_scale = mixolydian
 cv_degree = 1
 cv_octave = 0
 
