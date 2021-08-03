@@ -251,7 +251,7 @@ function init()
   ii.jf.run_mode(1)
   ii.jf.run(5)
 
-  -- declare Voices/sequencers:
+  -- declare voices/sequencers:
   one = Voice:new{id = 'one', octave = -1,
     action = function(self, val)
       self._degree = cv_degree
