@@ -1,17 +1,12 @@
 --- SeqSeqSeq
 
-ionian = {0,2,4,5,7,9,11}
-dorian = {0,2,3,5,7,9,10}
 phrygian = {0,1,3,5,7,8,10}
-lydian = {0,2,4,6,7,9,11}
-mixolydian = {0,2,4,5,7,9,10}
-aeolian = {0,2,3,5,7,8,10}
 
 pow2 = {1,2,4,8,16,32,64}
 odd = {1,3,5,7,9}
 even = {1,2,4,6,8,10}
 
-cv_scale = mixolydian
+cv_scale = phrygian
 cv_degree = 1
 cv_octave = 0
 
@@ -208,7 +203,7 @@ function init()
 
   input[2]{mode = 'change', threshold = 4, direction = 'rising',
     change = function()
-      -- user defined:
+      --
       action('play_seq', Voices)
 
     end
@@ -224,7 +219,7 @@ function init()
   clk_divider = Seq:new{id = 'clk_divider',
     action = function()
       output[1](pulse(pw))
-      -- user defined:
+      --
 
     end
   }
@@ -232,7 +227,7 @@ function init()
   clk = metro.init{time = 60/bpm,
     event = function()
       txi_getter()
-      -- user defined:
+      --
       bpm = linlin(txi.input[1], 0, 5, 10, 3000)
       clk_divider.division = selector(txi.input[2], pow2, 0, 4)
       set({'one','two','bass'}, 'level', linlin(txi.input[3], 0, 10, 0, 2))
@@ -247,11 +242,11 @@ function init()
   ii.jf.mode(1)
   ii.wsyn.ar_mode(1)
 
-  -- module settings
+  --
   ii.jf.run_mode(1)
   ii.jf.run(5)
 
-  -- declare voices/sequencers:
+  --
   one = Voice:new{id = 'one', octave = -1,
     action = function(self, val)
       self._degree = cv_degree
@@ -293,8 +288,17 @@ function init()
       self.seq[1]._division = val
     end
   }
-  sd:new_seq{sequence = {20,12, 20,2,1,9}, offset = 8, prob = 0.5, action = true}
   sd:new_seq{offset = 8, division = 16, action = true}
+
+  hh = Voice:new{id = 'hh', octave = -2, level = 0.1,
+    synth = function(note, level)
+      ii.wsyn.play_note(note, level)
+    end,
+    action = function(self, val)
+      self.seq[1]._division = val
+    end
+  }
+  hh:new_seq{sequence = {3,3,2, 3,1,1,2, 3,3,2, 1,2,2,2,1 }, division = 1, action = true}
 
   bass = Voice:new{id = 'bass', octave = -2,
     synth = function(note, level)
