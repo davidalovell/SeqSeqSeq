@@ -11,7 +11,7 @@ pow2 = {1,2,4,8,16,32,64}
 odd = {1,3,5,7,9}
 even = {1,2,4,6,8,10}
 
-cv_scale = mixolydian
+cv_scale = phrygian
 cv_degree = 1
 cv_octave = 0
 
@@ -143,7 +143,7 @@ function Seq:play_seq()
 
   return s.next and s.count >= 1 and s.div_count == 1 and s.action ~= nil
     and s.action(s.sequence[s.index])
-    or s.sequence[s.index] or 0
+    or s.sequence[s.index] --or 0
 end
 
 function Seq:reset()
@@ -235,8 +235,8 @@ function init()
       -- user defined:
       bpm = linlin(txi.input[1], 0, 5, 10, 3000)
       clk_divider.division = selector(txi.input[2], pow2, 0, 4)
-      set({'one','two','bass'}, 'level', linlin(txi.input[3], 0, 10, 0, 2))
-      set({'sd'}, 'level', linlin(txi.input[4], 0, 10, 0, 1))
+      set({'one','two','bass'}, '_level', linlin(txi.input[3], 0, 10, 0, 2))
+      set({'sd'}, '_level', linlin(txi.input[4], 0, 10, 0, 1))
       --
       clk.time = 60/bpm
       clk_reset:play_seq()
@@ -244,6 +244,7 @@ function init()
     end
   }
 
+  ii.pullup(true)
   ii.jf.mode(1)
   ii.wsyn.ar_mode(1)
 
@@ -252,7 +253,7 @@ function init()
   ii.jf.run(5)
 
   -- declare voices/sequencers:
-  one = Voice:new{id = 'one', octave = -1,
+  one = Voice:new{id = 'one', octave = -2,
     action = function(self, val)
       self._degree = cv_degree
       self._octave = cv_octave
@@ -267,7 +268,7 @@ function init()
   one:new_seq{sequence = {1,3,4}, action = true}
   one:new_seq{sequence = {true,false}}
 
-  two = Voice:new{id = 'two', degree = 5, octave = -2,
+  two = Voice:new{id = 'two', degree = 5, octave = -3,
     action = function(self, val)
       self._degree = cv_degree
       self._octave = cv_octave
@@ -285,7 +286,7 @@ function init()
   sd = Voice:new{id = 'sd', octave = -2,
     synth = function(note, level)
       ii.wsyn.lpg_symmetry(-5)
-      ii.wsyn.lpg_time(-math.random())
+      ii.wsyn.lpg_time(-math.random()*1.5)
       ii.wsyn.ramp(5)
       ii.wsyn.play_note(note, level)
     end,
@@ -293,10 +294,10 @@ function init()
       self.seq[1]._division = val
     end
   }
-  sd:new_seq{sequence = {20,12, 20,2,1,9}, offset = 8, prob = 0.5, action = true}
+  sd:new_seq{sequence = {20,12, 20,2,1,9}, offset = 8, prob = 1}--, action = true}
   sd:new_seq{offset = 8, division = 16, action = true}
 
-  bass = Voice:new{id = 'bass', octave = -2,
+  bass = Voice:new{id = 'bass', octave = -2, level = 2,
     synth = function(note, level)
       ii.jf.play_voice(1, note, level)
     end,
