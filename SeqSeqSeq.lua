@@ -244,7 +244,6 @@ function init()
     end
   }
 
-  ii.pullup(true)
   ii.jf.mode(1)
   ii.wsyn.ar_mode(1)
 
@@ -253,7 +252,7 @@ function init()
   ii.jf.run(5)
 
   -- declare voices/sequencers:
-  one = Voice:new{id = 'one', octave = -2,
+  one = Voice:new{id = 'one', octave = -1,
     action = function(self, val)
       self._degree = cv_degree
       self._octave = cv_octave
@@ -266,9 +265,9 @@ function init()
     end
   }
   one:new_seq{sequence = {1,3,4}, action = true}
-  one:new_seq{sequence = {true,false}}
+  one:new_seq{sequence = {true,true,false}}
 
-  two = Voice:new{id = 'two', degree = 5, octave = -3,
+  two = Voice:new{id = 'two', degree = 5, octave = -2,
     action = function(self, val)
       self._degree = cv_degree
       self._octave = cv_octave
@@ -281,7 +280,7 @@ function init()
     end
   }
   two:new_seq{sequence = {1,2,1,4}, action = true}
-  two:new_seq{sequence = {true,false}}
+  two:new_seq{sequence = {true,true,false}}
 
   sd = Voice:new{id = 'sd', octave = -2,
     synth = function(note, level)
