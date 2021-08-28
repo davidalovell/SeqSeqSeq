@@ -1,4 +1,4 @@
---- SeqSeqSeq
+--- SeqSeqSeq for crow 2.2
 
 ionian = {0,2,4,5,7,9,11}
 dorian = {0,2,3,5,7,9,10}
