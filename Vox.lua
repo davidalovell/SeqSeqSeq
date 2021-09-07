@@ -11,7 +11,7 @@ locrian = {0,1,3,5,6,8,10}
 
 penta_maj = {0,2,4,7,9} -- ionian, omit 4th and 7th
 penta_sus = {0,2,5,7,10} -- dorian, omit 3rd and 6th
-blues_min = {0,1,3,5,7,8,10} -- phrygian, omit 2nd and 5th
+blues_min = {0,3,5,8,10} -- phrygian, omit 2nd and 5th
 blues_maj = {0,2,5,7,9} -- myxolydian, omit 3rd and 7th
 penta_min = {0,3,4,7,10} -- aolian, omit 2nd and 6th
 japanese = {0,1,5,7,8} -- phrygian, omit 3rd and 7th
@@ -21,20 +21,19 @@ whole = {0,2,4,6,8,10}
 -- divisions
 divs = {1/32, 1/16, 1/8, 1/4, 1/2, 1, 2, 4, 8, 16, 32}
 
--- tables
-txi = {param = {0,0,0,0}, input = {0,0,0,0}}
-clk = {division = 1}
-
 -- initial values
-cv_scale = mixolydian
-cv_degree = 1
-cv_octave = 0
+cv = {
+  scale = mixolydian,
+  octave = 0,
+  degree = 1
+}
 --
 
 
 
 
--- Vox object 2021-09-05
+-- Vox object
+-- DL, last modified 2021-09-07
 Vox = {}
 
 function Vox:new(args)
@@ -47,7 +46,7 @@ function Vox:new(args)
   o.degree, o._degree = args.degree == nil and 1 or args.degree, 1
   o.transpose, o._transpose = args.transpose == nil and 0 or args.transpose, 0
 
-  o.scale = args.scale == nil and cv_scale or args.scale
+  o.scale = args.scale == nil and cv.scale or args.scale
   o.negharm = args.negharm == nil and false or args.negharm
   o.synth = args.synth == nil and function(note, level) ii.jf.play_note(note / 12, level) end or args.synth
 
@@ -83,13 +82,13 @@ function Vox:__neg() return (7 - self:__pos()) % 12 end
 function Vox:__note() return (self.negharm and self:__neg() or self:__pos()) + self:__octave() * 12 end
 
 -- functions for mulitple Vox objects
-function _set(property, val, objects)
+function _set(property, objects, val)
   for k, v in pairs(objects) do
     v[property] = val
   end
 end
 
-function _do(method, args, objects)
+function _do(method, objects, args)
   for k, v in pairs(objects) do
     v[method](v, args)
   end
@@ -99,23 +98,42 @@ end
 
 
 
--- txi getter and event handler
-function txi_getter()
+-- ii getters and event handlers
+-- DL, last modified 2021-09-07
+
+-- ii tables
+txi = {param = {0,0,0,0}, input = {0,0,0,0}} -- comment if no txi
+-- fb = {0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0} -- comment if no 16n faderbank
+
+-- ii getters
+function ii_getter() -- call this inside a a clock or metro
   if txi then
     for i = 1, 4 do
       ii.txi.get('param', i)
       ii.txi.get('in', i)
     end
   end
+  if fb then
+    for i = 1, 16 do
+      ii.faders.get(i)
+    end
+  end
 end
 
+-- ii event handlers
 ii.txi.event = function(e, val)
   if txi then
     txi[e.name == 'in' and 'input' or e.name][e.arg] = val
   end
 end
 
--- txi helper functions
+ii.faders.event = function(e, val)
+  if fb then
+    fb[e.arg] = val
+  end
+end
+
+-- helper functions
 function clamp(x, min, max)
   return math.min( math.max( min, x ), max )
 end
@@ -138,35 +156,6 @@ end
 
 
 
--- inputs
-input[1]{mode = 'scale', notes = cv_scale,
-  scale = function(s)
-    cv_degree = s.index
-    cv_octave = s.octave
-  end
-}
-
-input[2]{mode = 'change', threshold = 4, direction = 'rising',
-  change = function()
-    with:play{
-      degree = cv_degree,
-      octave = cv_octave,
-      on = with.seq.on(),
-      level = linlin(txi.input[4], 0, 5, 0, 2)
-    }
-  end
-}
---
-
-
-
-
--- output 1
-output[1]:clock(1)
---
-
-
-
 
 -- init
 function init()
@@ -175,15 +164,40 @@ function init()
   ii.jf.run_mode(1)
   ii.jf.run(5)
 
-  txi.action = function()
-    while true do
-      txi_getter()
-      clock.sync(1)
-      clock.tempo = linlin(txi.input[1], 0, 5, 30, 300)
-      -- clk.division = selector(txi.input[2], divs, 0, 5)
+  input[1]{mode = 'scale', notes = cv.scale,
+    scale = function(s)
+      cv.degree = s.index
+      cv.octave = s.octave
     end
-  end
-  clk.txi = clock.run(txi.action)
+  }
+
+  input[2]{mode = 'change', threshold = 4, direction = 'rising',
+    change = function()
+      tsnm:play{
+        degree = cv.degree,
+        octave = cv.octave,
+        on = tsnm.seq.on(),
+        level = linlin(txi.input[4], 0, 5, 0, 2)
+      }
+    end
+  }
+
+  output[1]:clock(1)
+
+  all = {
+    division = 1,
+    degree = 1,
+    action = function()
+      while true do
+        ii_getter()
+        clock.sync(1)
+        clock.tempo = linlin(txi.input[1], 0, 5, 30, 300)
+        all.degree = selector(txi.param[1], {1,4,5,7}, 0, 10)
+        -- all.division = selector(txi.input[2], divs, 0, 5)
+      end
+    end
+  }
+  all.clock = clock.run(all.action)
 
   bass = Vox:new{
     octave = -2,
@@ -195,14 +209,14 @@ function init()
         while true do
           clock.sync(bass.seq.sync())
           bass:play{
-            degree = bass.seq.degree() + cv_degree - 1,
+            degree = cv.degree + (bass.seq.degree() - 1) + (all.degree - 1),
             level = linlin(txi.input[2], 0, 5, 0, 3)
           }
         end
       end
     }
   }
-  clk.bass = clock.run(bass.seq.action)
+  bass.clock = clock.run(bass.seq.action)
 
   lead = Vox:new{
     octave = 0,
@@ -214,17 +228,16 @@ function init()
         while true do
           clock.sync(lead.seq.sync())
           lead:play{
-            degree = lead.seq.degree() + cv_degree - 1,
+            degree = cv.degree + (lead.seq.degree() - 1) + (all.degree - 1),
             level = linlin(txi.input[3], 0, 5, 0, 3)
           }
         end
       end
     }
   }
-  clk.lead = clock.run(lead.seq.action)
+  lead.clock = clock.run(lead.seq.action)
 
-
-  with = Vox:new{
+  tsnm = Vox:new{
     level = 0.3,
     synth = function(note, level) ii.wsyn.play_note(note / 12, level) end,
     seq = {
