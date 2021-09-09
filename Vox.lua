@@ -9,13 +9,6 @@ mixolydian = {0,2,4,5,7,9,10}
 aeolian = {0,2,3,5,7,8,10}
 locrian = {0,1,3,5,6,8,10}
 
--- I, II, III, IV, V, VI, VII = 1, 2, 3, 4, 5, 6, 7
--- penta_maj = ionian{I,II,III,V,VI}
--- penta_sus = _dorian{I,II,IV,V,VII}
--- blues_min = _phrygian{I,III,IV,VI,VII}
--- blues_maj = _mixolydian{I,II,IV,V,VI}
--- penta_min = _aeolian{I,III,IV,V,VII}
-
 penta_maj = mask(ionian, {1,2,3,5,6})
 penta_sus = mask(dorian, {1,2,4,5,7})
 blues_min = mask(phrygian, {1,3,4,6,7})
