@@ -9,21 +9,19 @@ mixolydian = {0,2,4,5,7,9,10}
 aeolian = {0,2,3,5,7,8,10}
 locrian = {0,1,3,5,6,8,10}
 
-penta_maj = {0,2,4,7,9} -- ionian, omit 4th and 7th
-penta_sus = {0,2,5,7,10} -- dorian, omit 3rd and 6th
-blues_min = {0,3,5,8,10} -- phrygian, omit 2nd and 5th
-blues_maj = {0,2,5,7,9} -- myxolydian, omit 3rd and 7th
-penta_min = {0,3,4,7,10} -- aolian, omit 2nd and 6th
-japanese = {0,1,5,7,8} -- phrygian, omit 3rd and 7th
-
-I, II, III, IV, V, VI, VII = 1, 2, 3, 4, 5, 6, 7
+-- I, II, III, IV, V, VI, VII = 1, 2, 3, 4, 5, 6, 7
 -- penta_maj = ionian{I,II,III,V,VI}
 -- penta_sus = _dorian{I,II,IV,V,VII}
 -- blues_min = _phrygian{I,III,IV,VI,VII}
 -- blues_maj = _mixolydian{I,II,IV,V,VI}
 -- penta_min = _aeolian{I,III,IV,V,VII}
 
--- penta_maj = mask(ionian, {1,2,3,5,6})
+penta_maj = mask(ionian, {1,2,3,5,6})
+penta_sus = mask(dorian, {1,2,4,5,7})
+blues_min = mask(phrygian, {1,3,4,6,7})
+blues_maj = mask(mixolydian, {1,2,4,5,6})
+penta_min = mask(aeolian, {1,3,4,5,7})
+japanese = mask(phrygian, {1,2,4,5,6})
 
 function mask(scale, degrees)
   local m = {}
