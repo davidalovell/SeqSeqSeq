@@ -34,8 +34,8 @@ cv = {
 
 -- Vox object
 -- DL, last modified 2021-09-07
-Vox = {}
 
+Vox = {}
 function Vox:new(args)
   local o = setmetatable( {}, {__index = Vox} )
   local args = args == nil and {} or args
