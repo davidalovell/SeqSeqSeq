@@ -23,14 +23,14 @@ I, II, III, IV, V, VI, VII = 1, 2, 3, 4, 5, 6, 7
 -- blues_maj = _mixolydian{I,II,IV,V,VI}
 -- penta_min = _aeolian{I,III,IV,V,VII}
 
--- penta_maj = scalemask(ionian, {1,2,3,5,6})
+-- penta_maj = mask(ionian, {1,2,3,5,6})
 
-function scalemask(scale, degrees)
-  local s = {}
+function mask(scale, degrees)
+  local m = {}
   for k, v in ipairs(degrees)
-    s[k] = scale[v]
+    m[k] = scale[v]
   end
-  return s
+  return m
 end
 
 whole = {0,2,4,6,8,10}
