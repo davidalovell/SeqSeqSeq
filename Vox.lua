@@ -25,6 +25,13 @@ I, II, III, IV, V, VI, VII = 1, 2, 3, 4, 5, 6, 7
 
 -- penta_maj = scalemask(ionian, {1,2,3,5,6})
 
+function scalemask(scale, degrees)
+  local s = {}
+  for k, v in ipairs(degrees)
+    s[k] = scale[v]
+  end
+  return s
+end
 
 whole = {0,2,4,6,8,10}
 
