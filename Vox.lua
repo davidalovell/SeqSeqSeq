@@ -16,6 +16,14 @@ blues_maj = {0,2,5,7,9} -- myxolydian, omit 3rd and 7th
 penta_min = {0,3,4,7,10} -- aolian, omit 2nd and 6th
 japanese = {0,1,5,7,8} -- phrygian, omit 3rd and 7th
 
+I, II, III, IV, V, VI, VII = 1, 2, 3, 4, 5, 6, 7
+-- penta_maj = ionian{I,II,III,V,VI}
+-- penta_sus = _dorian{I,II,IV,V,VII}
+-- blues_min = _phrygian{I,III,IV,VI,VII}
+-- blues_maj = _mixolydian{I,II,IV,V,VI}
+-- penta_min = _aeolian{I,III,IV,V,VII}
+
+
 whole = {0,2,4,6,8,10}
 
 -- divisions
