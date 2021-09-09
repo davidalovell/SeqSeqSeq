@@ -16,6 +16,8 @@ blues_maj = mask(mixolydian, {1,2,4,5,6})
 penta_min = mask(aeolian, {1,3,4,5,7})
 japanese = mask(phrygian, {1,2,4,5,6})
 
+-- chord builder function
+
 function mask(scale, degrees)
   local m = {}
   for k, v in ipairs(degrees)
