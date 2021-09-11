@@ -1,6 +1,9 @@
 --- Vox
 
 -- scales
+-- DL, last modified 2021-09-11
+
+-- modes
 ionian = {0,2,4,5,7,9,11}
 dorian = {0,2,3,5,7,9,10}
 phrygian = {0,1,3,5,7,8,10}
@@ -9,27 +12,37 @@ mixolydian = {0,2,4,5,7,9,10}
 aeolian = {0,2,3,5,7,8,10}
 locrian = {0,1,3,5,6,8,10}
 
+-- other scales
+whole = {0,2,4,6,8,10}
+
+-- scale mask function
+function mask(scale, degrees)
+  local m = {}
+  for k, v in ipairs(degrees) do
+    m[k] = scale[v]
+  end
+  return m
+end
+
+-- pentatonic scales
 penta_maj = mask(ionian, {1,2,3,5,6})
 penta_sus = mask(dorian, {1,2,4,5,7})
 blues_min = mask(phrygian, {1,3,4,6,7})
 blues_maj = mask(mixolydian, {1,2,4,5,6})
 penta_min = mask(aeolian, {1,3,4,5,7})
 japanese = mask(phrygian, {1,2,4,5,6})
+--
 
--- chord builder function
 
-function mask(scale, degrees)
-  local m = {}
-  for k, v in ipairs(degrees)
-    m[k] = scale[v]
-  end
-  return m
-end
 
-whole = {0,2,4,6,8,10}
 
 -- divisions
 divs = {1/32, 1/16, 1/8, 1/4, 1/2, 1, 2, 4, 8, 16, 32}
+--
+
+
+
+
 
 -- initial values
 cv = {
@@ -92,13 +105,13 @@ function Vox:__neg() return (7 - self:__pos()) % 12 end
 function Vox:__note() return (self.negharm and self:__neg() or self:__pos()) + self:__octave() * 12 end
 
 -- functions for mulitple Vox objects
-function _set(property, objects, val)
+function _set(objects, property, val)
   for k, v in pairs(objects) do
     v[property] = val
   end
 end
 
-function _do(method, objects, args)
+function _do(objects, method, args)
   for k, v in pairs(objects) do
     v[method](v, args)
   end
@@ -196,14 +209,12 @@ function init()
 
   all = {
     division = 1,
-    degree = 1,
     action = function()
       while true do
         ii_getter()
         clock.sync(1)
         clock.tempo = linlin(txi.input[1], 0, 5, 30, 300)
-        all.degree = selector(txi.param[1], {1,4,5,7}, 0, 10)
-        -- all.division = selector(txi.input[2], divs, 0, 5)
+        all.division = selector(txi.param[1], divs, 0, 10)
       end
     end
   }
@@ -217,9 +228,9 @@ function init()
       degree = sequins{1,1,sequins{5,8,7,5},sequins{8,5,6,2}:all():every(4)},
       action = function()
         while true do
-          clock.sync(bass.seq.sync())
+          clock.sync(bass.seq.sync() * all.division)
           bass:play{
-            degree = cv.degree + (bass.seq.degree() - 1) + (all.degree - 1),
+            degree = cv.degree + (bass.seq.degree() - 1),
             level = linlin(txi.input[2], 0, 5, 0, 3)
           }
         end
@@ -237,9 +248,9 @@ function init()
       degree = sequins{1,4,5,9},
       action = function()
         while true do
-          clock.sync(lead1.seq.sync())
+          clock.sync(lead1.seq.sync() * all.division)
           lead1:play{
-            degree = cv.degree + (lead1.seq.degree() - 1) + (all.degree - 1),
+            degree = cv.degree + (lead1.seq.degree() - 1),
             level = linlin(txi.input[3], 0, 5, 0, 3)
           }
         end
@@ -258,9 +269,9 @@ function init()
       degree = sequins{1,4,5,9}:step(2),
       action = function()
         while true do
-          clock.sync(lead2.seq.sync())
+          clock.sync(lead2.seq.sync() * all.division)
           lead2:play{
-            degree = cv.degree + (lead2.seq.degree() - 1) + (all.degree - 1),
+            degree = cv.degree + (lead2.seq.degree() - 1),
             level = linlin(txi.input[3], 0, 5, 0, 3)
           }
         end
@@ -276,8 +287,5 @@ function init()
       on = sequins{true,true,false}
     }
   }
-
-
-
 
 end
