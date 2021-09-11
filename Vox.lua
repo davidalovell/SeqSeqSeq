@@ -9,12 +9,22 @@ mixolydian = {0,2,4,5,7,9,10}
 aeolian = {0,2,3,5,7,8,10}
 locrian = {0,1,3,5,6,8,10}
 
-penta_maj = {0,2,4,7,9} -- ionian, omit 4th and 7th
-penta_sus = {0,2,5,7,10} -- dorian, omit 3rd and 6th
-blues_min = {0,3,5,8,10} -- phrygian, omit 2nd and 5th
-blues_maj = {0,2,5,7,9} -- myxolydian, omit 3rd and 7th
-penta_min = {0,3,4,7,10} -- aolian, omit 2nd and 6th
-japanese = {0,1,5,7,8} -- phrygian, omit 3rd and 7th
+penta_maj = mask(ionian, {1,2,3,5,6})
+penta_sus = mask(dorian, {1,2,4,5,7})
+blues_min = mask(phrygian, {1,3,4,6,7})
+blues_maj = mask(mixolydian, {1,2,4,5,6})
+penta_min = mask(aeolian, {1,3,4,5,7})
+japanese = mask(phrygian, {1,2,4,5,6})
+
+-- chord builder function
+
+function mask(scale, degrees)
+  local m = {}
+  for k, v in ipairs(degrees)
+    m[k] = scale[v]
+  end
+  return m
+end
 
 whole = {0,2,4,6,8,10}
 
@@ -34,8 +44,8 @@ cv = {
 
 -- Vox object
 -- DL, last modified 2021-09-07
-Vox = {}
 
+Vox = {}
 function Vox:new(args)
   local o = setmetatable( {}, {__index = Vox} )
   local args = args == nil and {} or args
