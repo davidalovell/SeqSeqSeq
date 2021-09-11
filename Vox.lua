@@ -203,8 +203,8 @@ function init()
     octave = -2,
     synth = function(note, level) ii.jf.play_voice(1, note / 12, level) end,
     seq = {
-      sync = sequins{3,1},
-      degree = sequins{1,1,sequins{5,8,7,5},sequins{8+1,8+5,8+6,8+2}:all():every(4)},
+      sync = sequins{4,4,3,1},
+      degree = sequins{1,1,sequins{5,8,7,5},sequins{8,5,6,2}:all():every(4)},
       action = function()
         while true do
           clock.sync(bass.seq.sync())
@@ -218,7 +218,8 @@ function init()
   }
   bass.clock = clock.run(bass.seq.action)
 
-  lead = Vox:new{
+  lead1 = Vox:new{
+    level = 0.5,
     octave = 0,
     synth = function(note, level) ii.jf.play_note(note / 12, level) end,
     seq = {
@@ -226,16 +227,37 @@ function init()
       degree = sequins{1,4,5,9},
       action = function()
         while true do
-          clock.sync(lead.seq.sync())
-          lead:play{
-            degree = cv.degree + (lead.seq.degree() - 1) + (all.degree - 1),
+          clock.sync(lead1.seq.sync())
+          lead1:play{
+            degree = cv.degree + (lead1.seq.degree() - 1) + (all.degree - 1),
             level = linlin(txi.input[3], 0, 5, 0, 3)
           }
         end
       end
     }
   }
-  lead.clock = clock.run(lead.seq.action)
+  lead1.clock = clock.run(lead1.seq.action)
+
+  lead2 = Vox:new{
+    level = 0.5,
+    octave = 0,
+    degree = 7,
+    synth = function(note, level) ii.jf.play_note(note / 12, level) end,
+    seq = {
+      sync = sequins{1.5},
+      degree = sequins{1,4,5,9}:step(2),
+      action = function()
+        while true do
+          clock.sync(lead2.seq.sync())
+          lead2:play{
+            degree = cv.degree + (lead2.seq.degree() - 1) + (all.degree - 1),
+            level = linlin(txi.input[3], 0, 5, 0, 3)
+          }
+        end
+      end
+    }
+  }
+  lead2.clock = clock.run(lead2.seq.action)
 
   tsnm = Vox:new{
     level = 0.3,
