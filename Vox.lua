@@ -212,7 +212,7 @@ function init()
     action = function()
       while true do
         ii_getter()
-        clock.sync(1)
+        clock.sync(1/32)
         clock.tempo = linlin(txi.input[1], 0, 5, 30, 300)
         all.division = selector(txi.param[1], divs, 0, 10)
       end
@@ -222,14 +222,16 @@ function init()
 
   bass = Vox:new{
     octave = -2,
-    synth = function(note, level) ii.jf.play_voice(1, note / 12, level) end,
+    synth = function(note, level) ii.jf.play_voice(6, note / 12, level) end,
     seq = {
-      sync = sequins{3,1},
+      sync_preset = { {4}, {3,1}, {2,2}, {3,1,2,2,1,3,2,2} },
+      sync = sequins{3,1,2,2,1,3,2,2},
       division = 1,
       degree = sequins{1,1,sequins{5,8,7,5},sequins{8,5,6,2}:all():every(4)},
       action = function()
         while true do
-          clock.sync(bass.seq.sync() * bass.seq.division * all.division)
+          -- bass.seq.sync:settable(selector(txi.param[2], bass.seq.sync_preset, 0, 10))
+          clock.sync(bass.seq.sync() * bass.seq.division * all.division * selector(txi.param[2], divs, 0, 10))
           bass:play{
             degree = cv.degree + (bass.seq.degree() - 1),
             level = linlin(txi.input[2], 0, 5, 0, 3)
@@ -250,7 +252,7 @@ function init()
       degree = sequins{1,4,5,9},
       action = function()
         while true do
-          clock.sync(lead1.seq.sync() * lead1.seq.division * all.division)
+          clock.sync(lead1.seq.sync() * lead1.seq.division * all.division * selector(txi.param[3], divs, 0, 10))
           lead1:play{
             degree = cv.degree + (lead1.seq.degree() - 1),
             level = linlin(txi.input[3], 0, 5, 0, 3)
@@ -272,7 +274,7 @@ function init()
       degree = sequins{1,4,5,9}:step(3),
       action = function()
         while true do
-          clock.sync(lead2.seq.sync() * lead2.seq.division * all.division)
+          clock.sync(lead2.seq.sync() * lead2.seq.division * all.division * selector(txi.param[4], divs, 0, 10))
           lead2:play{
             degree = cv.degree + (lead2.seq.degree() - 1),
             level = linlin(txi.input[3], 0, 5, 0, 3)
