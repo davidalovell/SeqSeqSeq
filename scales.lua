@@ -1,5 +1,5 @@
 -- scales
--- DL, last modified 2021-09-11
+-- DL, last modified 2021-09-12
 
 -- modes
 ionian = {0,2,4,5,7,9,11}
